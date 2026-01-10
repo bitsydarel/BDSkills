@@ -5,9 +5,32 @@ description: Implement clean architecture, adhere to layer responsibilities, and
 
 # Software Architecture
 
-This skill guides the internal structuring of software features, enforcing separation of concerns, strict dependency rules, and clean data flow.
+This skill guides the internal structuring of software features, enforcing separation of concerns, strict dependency rules, and clean data flow. Apply these principles to ensure features remain loosely coupled, testable, and maintainable.
 
 The user needs help with designing a feature, understanding where code belongs (Repository vs Service), or fixing dependency violations.
+
+---
+
+## Architecture Thinking
+
+Before creating files or folders, map the feature's requirements to the architecture layers:
+
+- **Boundaries**: Is this a self-contained feature (e.g., `authentication`) or a shared foundation (e.g., `common`)?
+- **Data Flow**: Where does data come from (Network, DB, Cache)? How does it reach the UI?
+- **Contracts**: What interface does the Domain layer need? (Define this *before* implementation).
+- **Dependencies**: Are high-level policies depending on low-level details? (They shouldn't).
+
+**CRITICAL**: Design from the **inside out** (Domain & Use Cases first), not outside in (Database or UI first). The UI is just a plugin to the business logic.
+
+### When This Applies
+
+Use this skill when:
+- Designing the structure of a new feature
+- Refactoring a "God Class" or monolithic module
+- Deciding where to put new logic (Repository vs. Service?)
+- Fixing circular dependencies
+- Implementing data caching or offline support
+- Reviewing PRs for architectural violations
 
 ---
 
@@ -15,27 +38,34 @@ The user needs help with designing a feature, understanding where code belongs (
 
 **Applies to**: Each feature module/package across all platforms
 
-Within a feature, use the same layer responsibilities. Names may differ slightly by platform, but **boundaries must match**.
+Structure features to enforce the dependency rule physically. While naming varies by platform, the **layers and boundaries must match**.
 
 ```
 /authentication
-  /ui                     # Views, widgets, screens, controllers
-  /cubits (or /view_models or /state)  # State management
+  /ui                     # Presentation (Views, Controllers)
+                          # DEPENDS ON: Use Cases, Business Objects
+  
+  /cubits                 # State Management (ViewModels, Stores)
+                          # DEPENDS ON: Use Cases, Business Objects
 
-  /use_cases              # Business logic orchestration
-  /business_objects       # Domain models
-  /exceptions             # Feature-specific errors
+  /use_cases              # Application Business Rules (Orchestrators)
+                          # DEPENDS ON: Repositories, Services, Business Objects
 
-  /repositories           # Data coordination and access
-  /services               # Functionality/capability providers
+  /business_objects       # Enterprise Business Rules (Entities)
+                          # DEPENDS ON: Nothing (Pure)
 
-  /data_sources
-    /contracts            # Interfaces specifying location + functionality
-    /impl                 # Implementations for each location type
-      /dtos               # Data transfer objects (private to impl)
+  /repositories           # Interface Adapters (Data Coordination)
+                          # DEPENDS ON: Data Source Contracts, Business Objects
 
-  authentication.dart     # Feature public API (barrel export)
-  (or index.ts, __init__.py, etc.)
+  /services               # Interface Adapters (Capabilities)
+                          # DEPENDS ON: Data Source Contracts
+
+  /data_sources           # Frameworks & Drivers (IO, DB, API)
+    /contracts            # Interfaces (Define location + behavior)
+    /impl                 # Implementations (The dirty details)
+      /dtos               # Data Transfer Objects (Private to impl)
+
+  authentication.dart     # Public API (Barrel file)
 ```
 
 ---
@@ -44,185 +74,94 @@ Within a feature, use the same layer responsibilities. Names may differ slightly
 
 | Layer | Responsibility | Contains |
 |-------|---------------|----------|
-| **UI** | Presentation | Views, widgets, screens, controllers, CLI handlers |
-| **State** | State management | Cubits, ViewModels, Reducers, Stores |
-| **Use Cases** | Business orchestration | Single-purpose business operations |
-| **Business Objects** | Domain models | Pure domain entities, value objects |
-| **Repositories** | Data coordination | Handles data access, caching, aggregation |
-| **Services** | Functionality providers | Provides capabilities/operations (not data) |
-| **Data Source Contracts** | Interface definition | Specifies location type + functionality |
-| **Data Source Impl** | Location-specific logic | Implements contract for specific location |
-| **DTOs** | Transfer objects | API response/request models, DB row models |
+| **Business Objects** | **What** data is (Pure) | Entities, Value Objects, Enums |
+| **Use Cases** | **What** the app does | Single-purpose classes (`LoginUseCase`) |
+| **Repositories** | **How** data is coordinated | `UserRepository` (decides Cache vs API) |
+| **Services** | **How** capabilities work | `AuthService`, `AnalyticsService` |
+| **Data Sources** | **Where** data lives | `RemoteUserDataSource`, `LocalUserDataSource` |
+| **UI / State** | **How** data is shown | Widgets, ViewModels, Presenters |
 
 ---
 
-## Repositories vs Services
+## Component Decision Guide
 
-| Component | Purpose | Examples |
-|-----------|---------|----------|
-| **Repository** | Handles **data** | UserRepository, OrderRepository, CacheRepository |
-| **Service** | Provides **functionality** | AuthService, NotificationService, AnalyticsService |
+### Repository vs. Service
 
-Both use Data Source contracts and receive implementations via dependency injection.
+Use this guide to decide where logic belongs:
 
----
+| Component | Focus | Example Responsibilities |
+|-----------|-------|--------------------------|
+| **Repository** | **Data** | CRUD operations, Caching strategies, Fetching, Saving |
+| **Service** | **Capabilities** | 3rd Party APIs (Stripe), Device features (Camera), System events |
 
-## Data Source Architecture
+**Rule of Thumb**: If it acts like a collection of data, it's a Repository. If it performs an action, it's a Service.
 
-**Applies to**: All data access and external functionality
+### Data Source Architecture
 
-Data Sources have two parts:
+Data Sources are the boundary between your clean code and the outside world.
 
-1. **Contract (Interface)**: Defines the location type (local/external) AND the functionality
-2. **Implementation**: Provides the actual logic for that specific location
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                  Repository / Service                        │
-│  Uses: Data Source Contract (interface)                      │
-│  Receives: Implementation via dependency injection           │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Data Source Contract (Interface)                │
-│  Specifies: Location type (local/external) + functionality   │
-│  Example: CacheUserDataSource, RemoteUserDataSource          │
-└─────────────────────────────────────────────────────────────┘
-                              │
-          ┌───────────────────┼───────────────────┐
-          ▼                   ▼                   ▼
-┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
-│ Memory Impl     │ │ File Impl       │ │ Cloud Impl      │
-│ (in-memory)     │ │ (local file)    │ │ (remote API)    │
-└─────────────────┘ └─────────────────┘ └─────────────────┘
-```
-
-**Example: Cache User Data Source**
+1.  **Contract (Interface)**: Defines *what* is needed. Lives in the Data Source layer but is imported by Repositories.
+2.  **Implementation**: Defines *how* it works. Injected via Dependency Injection.
 
 ```
-Contract: CacheUserDataSource
-  - getUser(id) -> User?
-  - saveUser(user) -> void
-  - clearCache() -> void
-
-Implementations:
-  - MemoryCacheUserDataSource  (stores in memory)
-  - FileCacheUserDataSource    (stores in local file)
-  - CloudCacheUserDataSource   (stores in cloud/Redis)
+                  Dependency Direction
+Repository ─────────────────────────────────> Data Source Contract
+                                                      ^
+                                                      │ (implements)
+                                                      │
+                                              Data Source Impl
 ```
-
-**Guidance**:
-- Contracts define WHAT the data source does and WHERE it operates (local/external)
-- Implementations define HOW for a specific storage mechanism
-- Developer chooses which implementation to inject at runtime/composition root
-- This allows swapping implementations without changing business logic
-
----
-
-## Platform-Specific Layer Names
-
-| Layer | Flutter | iOS | Android | Backend |
-|-------|---------|-----|---------|---------|
-| UI | /ui | /Views | /ui | /handlers or /controllers |
-| State | /cubits | /ViewModels | /viewmodels | /handlers |
-| Use Cases | /use_cases | /UseCases | /usecases | /use_cases |
-| Domain | /business_objects | /Models | /domain | /domain or /models |
-| Repository | /repositories | /Repositories | /repositories | /repositories |
-| Service | /services | /Services | /services | /services |
-| Data Source | /data_sources | /DataSources | /datasources | /data_sources or /adapters |
 
 ---
 
 ## Dependency Rules
 
-**CRITICAL**: These import rules enforce clean architecture boundaries across ALL platforms.
+**CRITICAL**: Dependencies must point **inwards** towards high-level policies.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     UI / Handlers Layer                      │
-│  Imports: Use Cases, Business Objects (for rendering)        │
-│  NEVER imports: Repositories, Services, Data Sources         │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                       Use Cases Layer                        │
-│  Imports: Repositories, Services, Business Objects           │
-│  NEVER imports: Data Sources, DTOs, UI                       │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   Repositories/Services Layer                │
-│  Imports: Data Source Contracts, Business Objects            │
-│  Receives: Data Source Implementations via DI                │
-│  NEVER imports: UI, State, Use Cases                         │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     Data Sources Layer                       │
-│  Contracts: Define location type + functionality             │
-│  Implementations: Provide logic for specific location        │
-│  Imports: External libraries, internal DTOs                  │
-│  Returns: Business Objects (maps DTOs → Domain)              │
-│  DTOs are PRIVATE to implementations                         │
-└─────────────────────────────────────────────────────────────┘
-```
+1.  **UI** depends on **Use Cases** (or ViewModels).
+2.  **Use Cases** depend on **Repositories/Services** (Interfaces).
+3.  **Repositories** depend on **Data Source Contracts**.
+4.  **Data Source Impls** depend on **External Libs** & **DTOs**.
+5.  **Business Objects** depend on **Nothing**.
 
-### Import Rules Summary
-
-| Layer | Can Import | Cannot Import |
-|-------|------------|---------------|
-| UI / Handlers & State | Use Cases, Business Objects | Repositories, Services, Data Sources |
-| Use Cases | Repositories, Services, Business Objects | Data Sources, DTOs, UI |
-| Repositories/Services | Data Source Contracts, Business Objects | UI, Use Cases, Data Source Impls directly |
-| Data Source Impl | External libs, DTOs | UI, Use Cases, Repositories |
+**Forbidden Imports**:
+- UI importing Data Sources directly.
+- Use Cases importing DTOs (Domain pollution).
+- Business Objects importing *anything* framework-specific (e.g., JSON parsers, HTTP clients).
 
 ---
 
 ## Feature Public API
 
-**Applies to**: Feature barrel exports (all platforms)
+**Applies to**: Encapsulation
 
-Each feature exposes a minimal public API via a barrel file:
+Each feature must act like a separate library. Expose **only** what other features need.
 
-**Flutter** (`authentication.dart`):
-```dart
-export 'ui/login_screen.dart';
-export 'business_objects/user.dart';
-```
+**Expose**:
+- UI Pages/Screens (for navigation)
+- Business Objects (shared models)
+- Main Use Cases (rarely, usually via specific inter-feature contracts)
 
-**Python** (`authentication/__init__.py`):
-```python
-from .use_cases import LoginUseCase, LogoutUseCase
-from .business_objects import User
-```
-
-**TypeScript** (`authentication/index.ts`):
-```typescript
-export { LoginUseCase } from './use-cases';
-export { User } from './business-objects';
-```
-
-**Go** (package exports via capitalization):
-```go
-// Only exported (capitalized) symbols form the public API
-type User struct { ... }
-func NewLoginUseCase(...) *LoginUseCase { ... }
-```
-
-**CRITICAL**: Internal implementation details (repositories, services, data sources, DTOs) are NOT exported.
+**Hide (Private)**:
+- Repositories
+- Data Sources
+- DTOs
+- Internal helper functions
 
 ---
 
 ## Architecture Anti-Patterns (NEVER use)
 
-- **Deep imports into features**: Use barrel exports, not internal paths (e.g., `import X from 'feat/internal/repo'`)
-- **UI importing data sources**: Respect layer boundaries; UI only calls Use Cases (or Repos if simple, but never Data Sources directly)
-- **DTOs leaking outside data sources**: Map DTOs to Business Objects immediately in the Data Source or Repository.
-- **Mixing repository and service concerns**: Repositories for data; Services for capability.
-- **Hardcoding data source implementations**: Use Dependency Injection.
-- **Circular dependencies**: Often a sign of poor separation.
-- **God packages**: Split large packages by concern.
+- **Deep Imports**: Importing `feature/src/internal/repo.ts`. **Fix**: Use the barrel file.
+- **Leaking DTOs**: Returning `UserDTO` from a Repository. **Fix**: Map to `User` entity inside the Data Source or Repository.
+- **Logic in UI**: Making API calls or complex decisions in the View. **Fix**: Move to Use Case or Cubit.
+- **God Repositories**: A `GeneralRepository` doing everything. **Fix**: Split by domain entity (`UserRepository`, `OrderRepository`).
+- **Hard Dependencies**: `new PostgresDataSource()`. **Fix**: Use Dependency Injection.
+
+---
+
+## Core Philosophy
+
+> "The software architecture of a system is the set of structures needed to reason about the system, which comprises software elements, relations among them, and properties of both." — Len Bass
+
+Good architecture is about **deferring decisions**. By strictly separating layers, you allow the database, UI framework, or external APIs to change without breaking your business logic.
