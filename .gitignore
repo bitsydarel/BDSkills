@@ -1210,6 +1210,8 @@ FodyWeavers.xsd
 !README.md
 !LICENSE
 !*/
+!/.claude/skills/
+!SKILL.md
 *.bin
 *.elf
 *.hex
@@ -2254,6 +2256,7 @@ inc/
 /MANIFEST.bak
 /pm_to_blib
 /*
+!/.claude/
 !/jobs
 !/*.xml
 jobs/**
