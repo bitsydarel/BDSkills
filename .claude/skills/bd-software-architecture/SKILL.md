@@ -38,10 +38,12 @@ Use this skill when:
 
 **Applies to**: Each feature module/package across all platforms
 
-Structure features to enforce the dependency rule physically. While naming varies by platform, the **layers and boundaries must match**.
+Structure features to enforce the dependency rule physically. The goal is consistent layering, even if naming conventions vary slightly by platform.
+
+### Conceptual Layout
 
 ```
-/authentication
+/feature_name
   /ui                     # Presentation (Views, Controllers)
                           # DEPENDS ON: Use Cases, Business Objects
   
@@ -65,8 +67,22 @@ Structure features to enforce the dependency rule physically. While naming varie
     /impl                 # Implementations (The dirty details)
       /dtos               # Data Transfer Objects (Private to impl)
 
-  authentication.dart     # Public API (Barrel file)
+  feature_name.dart       # Public API (Barrel export)
 ```
+
+### Platform Mapping
+
+Use this guide to translate the conceptual layers to platform-specific conventions while maintaining the architecture.
+
+| Concept | Flutter | iOS (Swift) | Android (Kotlin) | Backend (Python/Node) |
+|---------|---------|-------------|------------------|-----------------------|
+| **UI** | `/ui` | `/Views` | `/ui` | `/handlers` or `/controllers` |
+| **State** | `/cubits` | `/ViewModels` | `/viewmodels` | `/handlers` |
+| **Use Cases** | `/use_cases` | `/UseCases` | `/usecases` | `/use_cases` |
+| **Domain** | `/business_objects` | `/Models` | `/domain` | `/domain` or `/models` |
+| **Repository** | `/repositories` | `/Repositories` | `/repositories` | `/repositories` |
+| **Service** | `/services` | `/Services` | `/services` | `/services` |
+| **Data Source** | `/data_sources` | `/DataSources` | `/datasources` | `/data_sources` or `/adapters` |
 
 ---
 
