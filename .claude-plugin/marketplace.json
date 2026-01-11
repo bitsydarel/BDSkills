@@ -3,6 +3,7 @@
   "name": "bd-skills",
   "version": "1.0.0",
   "description": "Comprehensive development skills for clean code, testing, architecture, and quality assurance. Applies to Mobile, Web, Backend, and AI/ML development.",
+  "pluginRoot": "./plugins",
   "owner": {
     "name": "Bitsy Darel",
     "email": "bitsydarel@gmail.com"
