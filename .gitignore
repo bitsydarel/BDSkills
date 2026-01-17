@@ -1,3 +1,9 @@
+# IDE and Editor
 .idea/
-.claude/
+
+# Virtual Environment
 .venv/
+
+# Claude local settings (not skills - those are in skills/)
+.claude/settings.local.json
+

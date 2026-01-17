@@ -1,0 +1,19 @@
+#!/bin/bash
+#
+# post-merge hook - Run sync-skills.sh after merge
+#
+# Git runs this hook after:
+# - git merge
+# - git pull (which does a merge)
+#
+# Arguments:
+#   $1 = flag indicating whether the merge was a squash merge
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+SYNC_SCRIPT="$REPO_ROOT/scripts/sync-skills.sh"
+
+if [ -x "$SYNC_SCRIPT" ]; then
+    echo "Running skills sync after merge..."
+    "$SYNC_SCRIPT" > /dev/null 2>&1
+    echo "Skills synchronized."
+fi

@@ -1,10 +1,93 @@
-# BD Skills - Claude Code Plugin Marketplace
+# BD Skills - Agent Skills Repository
 
-Professional development skills for Claude Code covering clean code, testing, architecture, and quality assurance.
+Professional development skills for AI coding agents. Works with multiple agent tools including OpenCode, Cursor, Gemini CLI, and the Claude Code Plugin Marketplace.
 
-## Installation
+## Quick Start
 
-Add the marketplace to Claude Code:
+After cloning the repository, run the setup script:
+
+```bash
+./scripts/setup.sh
+```
+
+This installs git hooks and syncs skills to all agent tool locations.
+
+## Repository Structure
+
+```
+BDSkills/
+├── skills/                    # CANONICAL SOURCE (edit skills here)
+│   ├── bd-clean-code-writing/
+│   ├── bd-tests-design/
+│   ├── bd-problem-solving/
+│   ├── bd-quality-assurance/
+│   ├── bd-project-conventions/
+│   └── bd-software-architecture/
+│
+├── .opencode/skill/           # Symlinks for OpenCode
+├── .cursor/skills/            # Symlinks for Cursor
+├── .gemini/skills/            # Symlinks for Gemini CLI
+├── plugins/                   # Symlinks for Plugin Marketplace
+│
+├── scripts/
+│   ├── setup.sh               # Initial setup (run after clone)
+│   └── sync-skills.sh         # Sync skills to all locations
+│
+└── hooks/                     # Git hook templates
+```
+
+## How It Works
+
+The `skills/` directory is the **single source of truth**. All other locations contain symlinks pointing to this directory. This ensures:
+
+- **One place to edit**: Modify skills in `skills/` only
+- **Automatic updates**: Changes propagate to all agent tools instantly
+- **No duplicates**: No risk of skills getting out of sync
+
+## Supported Agent Tools
+
+| Tool | Location | Format |
+|------|----------|--------|
+| OpenCode | `.opencode/skill/<name>/SKILL.md` | Agent Skills |
+| Cursor | `.cursor/skills/<name>/SKILL.md` | Agent Skills |
+| Gemini CLI | `.gemini/skills/<name>/SKILL.md` | Agent Skills |
+| Claude Code Plugin | `plugins/<name>/skills/<name>/SKILL.md` | Marketplace |
+
+## Available Skills
+
+| Skill | Description |
+|-------|-------------|
+| bd-clean-code-writing | SOLID principles, clean code guidelines, type safety |
+| bd-tests-design | Test strategies, TDD, edge case coverage, property-based testing |
+| bd-problem-solving | Debugging methodology, root cause analysis, code comprehension |
+| bd-quality-assurance | Pre-commit checks, quality gates, CI/CD standards |
+| bd-project-conventions | Project structure, environment setup, dependency management |
+| bd-software-architecture | Layer separation, dependency rules, feature structure |
+
+## Manual Sync
+
+If symlinks get out of sync, run:
+
+```bash
+./scripts/sync-skills.sh
+```
+
+To check current status without making changes:
+
+```bash
+./scripts/sync-skills.sh --status
+```
+
+## Git Hooks
+
+After running `./scripts/setup.sh`, git hooks are installed that automatically sync skills after:
+
+- `git checkout` / `git switch`
+- `git pull` / `git merge`
+
+## Installation (Plugin Marketplace)
+
+To install skills via Claude Code Plugin Marketplace:
 
 ```bash
 /plugin marketplace add darelbitsy/BDSkills
@@ -16,17 +99,6 @@ Then browse and install skills:
 /plugin menu
 ```
 
-## Available Skills
-
-| Skill | Category | Description |
-|-------|----------|-------------|
-| bd-clean-code-writing | development | SOLID principles, clean code guidelines, type safety |
-| bd-tests-design | development | Test strategies, TDD, edge case coverage, property-based testing |
-| bd-problem-solving | development | Debugging methodology, root cause analysis, code comprehension |
-| bd-quality-assurance | productivity | Pre-commit checks, quality gates, CI/CD standards |
-| bd-project-conventions | development | Project structure, environment setup, dependency management |
-| bd-software-architecture | development | Layer separation, dependency rules, feature structure |
-
 ## Platform Support
 
 All skills apply universally to:
@@ -36,57 +108,6 @@ All skills apply universally to:
 - **Backend**: Python, Node.js, Go, Rust
 - **AI/ML**: Training pipelines, model serving
 
-## Skill Details
-
-### bd-clean-code-writing
-
-Write clean, maintainable code following SOLID principles. Covers:
-- Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion
-- Cognitive complexity limits
-- Type safety and explicit annotations
-- Pure functions and immutability
-
-### bd-tests-design
-
-Design comprehensive test strategies. Covers:
-- Test-Driven Development (TDD)
-- Equivalence Partitioning, Boundary Value Analysis
-- CORRECT Heuristic, Right-BICEP
-- Property-based testing
-- Edge case coverage
-
-### bd-problem-solving
-
-Apply systematic problem-solving approaches. Covers:
-- Tree of Thoughts methodology
-- Graph of Thoughts code comprehension
-- Top-down and bottom-up analysis
-- Root cause identification
-
-### bd-quality-assurance
-
-Run quality checks before committing. Covers:
-- Pre-commit checklist (format, type check, lint, test, build)
-- Platform-specific tool recommendations
-- Quality gates and standards enforcement
-
-### bd-project-conventions
-
-Follow project structure conventions. Covers:
-- Feature-by-folder organization
-- Environment configuration
-- Dependency management
-- Import conventions
-
-### bd-software-architecture
-
-Structure software with strict layer separation. Covers:
-- 8 non-negotiable architecture rules
-- Dependency matrix
-- Repository vs Service decisions
-- Use case composition guidelines
-- Error translation patterns
-
 ## License
 
-MIT
+Apache-2.0

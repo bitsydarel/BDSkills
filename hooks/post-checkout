@@ -1,0 +1,27 @@
+#!/bin/bash
+#
+# post-checkout hook - Run sync-skills.sh after checkout
+#
+# Git runs this hook after:
+# - git checkout
+# - git switch
+# - git clone (if there's a post-checkout hook)
+#
+# Arguments:
+#   $1 = ref of previous HEAD
+#   $2 = ref of new HEAD
+#   $3 = 1 if checking out a branch, 0 if checking out a file
+
+# Only run on branch checkouts, not file checkouts
+if [ "$3" != "1" ]; then
+    exit 0
+fi
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+SYNC_SCRIPT="$REPO_ROOT/scripts/sync-skills.sh"
+
+if [ -x "$SYNC_SCRIPT" ]; then
+    echo "Running skills sync after checkout..."
+    "$SYNC_SCRIPT" > /dev/null 2>&1
+    echo "Skills synchronized."
+fi
