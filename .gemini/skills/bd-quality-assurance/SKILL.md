@@ -1,6 +1,6 @@
 ---
 name: bd-quality-assurance
-description: Run quality checks and maintain code standards before committing. Use before commits, when preparing PRs, or after completing features.
+description: Enforces code standards and validates release readiness. Use when finalizing features or refactors, preparing pull requests, or performing pre-commit checks.
 ---
 
 # Quality Assurance

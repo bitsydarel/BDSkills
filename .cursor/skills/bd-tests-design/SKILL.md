@@ -1,6 +1,6 @@
 ---
 name: bd-tests-design
-description: Design comprehensive test strategies and write well-structured tests. Use when creating tests, improving coverage, or designing test architectures.
+description: Designs and implements validation logic. Use when writing, updating, refactoring, or fixing single test cases or full suites, including unit, integration, E2E, and UI automation.
 ---
 
 # Test Design

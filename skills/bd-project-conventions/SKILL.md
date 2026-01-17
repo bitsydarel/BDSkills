@@ -1,6 +1,6 @@
 ---
 name: bd-project-conventions
-description: Follow project structure conventions and setup procedures. Use when onboarding, setting up environments, or troubleshooting import/build issues.
+description: Ensures code compliance with project conventions and structure. Use when scaffolding new files, refactoring code, configuring environments, or troubleshooting import/build issues.
 ---
 
 # Project Conventions

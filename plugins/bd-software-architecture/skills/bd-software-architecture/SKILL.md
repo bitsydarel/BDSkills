@@ -1,6 +1,6 @@
 ---
 name: bd-software-architecture
-description: Structure software with strict layer separation, enforce dependency rules, and organize features correctly. Use when designing new features, refactoring modules, or reviewing architectural decisions.
+description: Enforces architectural patterns, layer separation, and data flow rules. Use when designing features, refactoring legacy code, defining boundaries, or analyzing dependencies.
 ---
 
 # Software Architecture

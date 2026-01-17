@@ -1,6 +1,6 @@
 ---
 name: bd-problem-solving
-description: Apply systematic problem-solving approaches when debugging, designing solutions, or understanding code. Use when facing technical challenges or exploring unfamiliar codebases.
+description: Evaluates options, performs problem-solving, analyzes logic, and determines the best course of action. Use for decision-making, debugging, resolving technical issues, and exploring codebases.
 ---
 
 # Problem Solving

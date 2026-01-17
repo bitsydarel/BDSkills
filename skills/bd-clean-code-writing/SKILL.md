@@ -1,6 +1,6 @@
 ---
 name: bd-clean-code-writing
-description: Write clean, maintainable code following SOLID principles. Use when writing functions, classes, modules, or refactoring existing code.
+description: Generates, refactors, and modifies code. Use when writing functions, classes, modules, scripts or refactoring existing code.
 ---
 
 # Clean Code Writing
