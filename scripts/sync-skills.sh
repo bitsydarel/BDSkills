@@ -11,7 +11,7 @@
 #   ./scripts/sync-skills.sh --help   # Show help
 #
 # The canonical source is the 'skills/' directory at the repo root.
-# All other locations use hard links to the SKILL.md files.
+# All other locations use hard links to the skill directory contents.
 
 set -euo pipefail
 
@@ -34,6 +34,7 @@ declare -a TARGETS=(
     ".opencode/skill"
     ".cursor/skills"
     ".gemini/skills"
+    ".github/skills"
 )
 
 # Function to print colored output
@@ -59,10 +60,11 @@ Supported Agent Tools:
     - OpenCode      (.opencode/skill/)
     - Cursor        (.cursor/skills/)
     - Gemini CLI    (.gemini/skills/)
+    - GitHub        (.github/skills/)
     - Plugin Marketplace (plugins/*/skills/*/)
 
 The canonical source is: skills/
-All other locations use hard links to the SKILL.md files in the canonical source.
+All other locations use hard links to the skill directory contents in the canonical source.
 
 Note: Hard links ensure all tools can read the files directly (unlike symlinks which
 some tools may not follow).
@@ -226,23 +228,42 @@ sync_skills() {
             # Create skill directory
             mkdir -p "$target_skill_dir"
             
-            # Hard link SKILL.md
-            if [[ -f "$source_skill_dir/SKILL.md" ]]; then
-                ln -f -F -v "$source_skill_dir/SKILL.md" "$target_skill_dir/SKILL.md"
-            fi
-            
-            # Hard link any other files in the skill directory
-            for file in "$source_skill_dir"/*; do
-                if [[ -f "$file" ]]; then
-                    local filename=$(basename "$file")
-                    if [[ ! -f "$target_skill_dir/$filename" ]]; then
-                        ln -f -F -v "$file" "$target_skill_dir/$filename"
-                    fi
+            # Hard link all files and replicate directories (skip hidden paths and symlinks)
+            while IFS= read -r source_path; do
+                local source_prefix="$source_skill_dir/"
+                local relative_path="${source_path#$source_prefix}"
+                local target_item_path="$target_skill_dir/$relative_path"
+
+                if [[ -d "$source_path" ]]; then
+                    mkdir -p "$target_item_path"
+                elif [[ -f "$source_path" ]]; then
+                    mkdir -p "$(dirname "$target_item_path")"
+                    ln -f -v "$source_path" "$target_item_path"
                 fi
-            done
+            done < <(find "$source_skill_dir" -mindepth 1 \( -path '*/.*' -o -name '.*' \) -prune -o -type l -prune -o -type d -print -o -type f -print)
         done
         
         print_success "Created ${#skills[@]} skill directories with hard links in $target"
+    done
+
+    # Prune plugins that do not map to canonical skills
+    for plugin_dir in "$REPO_ROOT"/plugins/*/; do
+        if [[ -d "$plugin_dir" ]]; then
+            local plugin_name=$(basename "$plugin_dir")
+            local found=0
+
+            for skill_name in "${skills[@]}"; do
+                if [[ "$skill_name" == "$plugin_name" ]]; then
+                    found=1
+                    break
+                fi
+            done
+
+            if [[ $found -eq 0 ]]; then
+                print_warning "Removing unknown plugin directory: $plugin_name"
+                rm -rf "$plugin_dir"
+            fi
+        fi
     done
     echo ""
     
@@ -260,13 +281,19 @@ sync_skills() {
         # Remove existing files
         rm -rf "$skills_subdir"/*
         
-        # Hard link SKILL.md and any other files
-        for file in "$source_skill_dir"/*; do
-            if [[ -f "$file" ]]; then
-                local filename=$(basename "$file")
-                ln -f -F -v "$file" "$skills_subdir/$filename"
+        # Hard link all files and replicate directories (skip hidden paths and symlinks)
+        while IFS= read -r source_path; do
+            local source_prefix="$source_skill_dir/"
+            local relative_path="${source_path#$source_prefix}"
+            local target_item_path="$skills_subdir/$relative_path"
+
+            if [[ -d "$source_path" ]]; then
+                mkdir -p "$target_item_path"
+            elif [[ -f "$source_path" ]]; then
+                mkdir -p "$(dirname "$target_item_path")"
+                ln -f -v "$source_path" "$target_item_path"
             fi
-        done
+        done < <(find "$source_skill_dir" -mindepth 1 \( -path '*/.*' -o -name '.*' \) -prune -o -type l -prune -o -type d -print -o -type f -print)
     done
     
     print_success "Created ${#skills[@]} skill directories with hard links in plugins/"

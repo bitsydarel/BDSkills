@@ -18,7 +18,7 @@ This installs git hooks and syncs skills to all agent tool locations.
 BDSkills/
 ├── skills/                    # CANONICAL SOURCE (edit skills here)
 │   ├── bd-clean-code-writing/
-│   ├── bd-tests-design/
+│   ├── bd-test-design/
 │   ├── bd-problem-solving/
 │   ├── bd-quality-assurance/
 │   ├── bd-project-conventions/
@@ -58,7 +58,7 @@ The `skills/` directory is the **single source of truth**. All other locations c
 | Skill | Description |
 |-------|-------------|
 | bd-clean-code-writing | SOLID principles, clean code guidelines, type safety |
-| bd-tests-design | Test strategies, TDD, edge case coverage, property-based testing |
+| bd-test-design | Test strategies, TDD, edge case coverage, property-based testing |
 | bd-problem-solving | Debugging methodology, root cause analysis, code comprehension |
 | bd-quality-assurance | Pre-commit checks, quality gates, CI/CD standards |
 | bd-project-conventions | Project structure, environment setup, dependency management |

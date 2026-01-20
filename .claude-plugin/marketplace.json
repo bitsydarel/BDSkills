@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "bd-skills",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Comprehensive development skills for clean code, testing, architecture, and quality assurance. Applies to Mobile, Web, Backend, and AI/ML development.",
   "pluginRoot": "./plugins",
   "owner": {
@@ -12,43 +12,50 @@
     {
       "name": "bd-clean-code-writing",
       "description": "Write clean, maintainable code following SOLID principles. Use when writing functions, classes, modules, or refactoring existing code.",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "source": "./plugins/bd-clean-code-writing",
       "category": "development"
     },
     {
-      "name": "bd-tests-design",
+      "name": "bd-test-design",
       "description": "Design comprehensive test strategies and write well-structured tests. Use when creating tests, improving coverage, or designing test architectures.",
-      "version": "1.0.1",
-      "source": "./plugins/bd-tests-design",
+      "version": "1.0.2",
+      "source": "./plugins/bd-test-design",
       "category": "development"
     },
     {
       "name": "bd-problem-solving",
       "description": "Apply systematic problem-solving approaches when debugging, designing solutions, or understanding code. Use when facing technical challenges.",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "source": "./plugins/bd-problem-solving",
       "category": "development"
     },
     {
       "name": "bd-quality-assurance",
       "description": "Run quality checks and maintain code standards before committing. Use before commits, when preparing PRs, or after completing features.",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "source": "./plugins/bd-quality-assurance",
       "category": "productivity"
     },
     {
       "name": "bd-project-conventions",
       "description": "Follow project structure conventions and setup procedures. Use when onboarding, setting up environments, or troubleshooting import/build issues.",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "source": "./plugins/bd-project-conventions",
       "category": "development"
     },
     {
       "name": "bd-software-architecture",
       "description": "Structure software with strict layer separation, enforce dependency rules, and organize features correctly. Use when designing new features or refactoring.",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "source": "./plugins/bd-software-architecture",
+      "category": "development"
+    },
+    {
+      "name": "teg-mobile-architecture",
+      "description": "Enforce Transport Exchange Group (TEG) mobile architecture standards. Use this skill when designing new mobile features, structuring project folders, implementing architectural layers (UI, Use Case, Repository, Data Source), or reviewing PRs for compliance across Flutter, iOS, and Android.",
+      "version": "1.0.0",
+      "source": "./plugins/teg-mobile-architecture",
       "category": "development"
     }
   ]
