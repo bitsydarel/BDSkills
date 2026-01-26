@@ -37,6 +37,8 @@ Ensure all tests follow this pattern:
 2. **Act**: Execute the behavior.
 3. **Assert**: Verify outcome.
 
+See [references/aaa-examples.md](references/aaa-examples.md) for code examples.
+
 ### Isolation & Naming
 - **Isolation**: No shared mutable state. Mocks/stubs for external deps.
 - **Naming**: `should_[outcome]_when_[scenario]` or `test_[scenario]_[expected_outcome]`.

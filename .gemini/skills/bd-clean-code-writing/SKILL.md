@@ -31,3 +31,15 @@ Verify the output against these critical constraints:
 * [ ] **Nesting**: Max 3 levels.
 * [ ] **Type Safety**: No `Any` or `dynamic` types; explicit nullability.
 * [ ] **Magic Values**: All strings/numbers extracted to constants/enums.
+
+## Common Pitfalls
+Avoid these issues by reviewing [architecture.md](references/architecture.md) for detailed anti-patterns.
+
+## Examples
+### Design Analysis Example
+**Bad (too broad)**: "Create a user management system for authentication and profiles."  
+**Good (single responsibility)**: "Implement user authentication with login/logout."
+
+### Implementation Example
+**Before (violates SOLID)**: Large class with multiple responsibilities.  
+**After**: Split into `UserService` (interface), `AuthService` (implementation), `ProfileRepository` (data access).
