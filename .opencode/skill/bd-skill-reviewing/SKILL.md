@@ -1,6 +1,6 @@
 ---
 name: bd-skill-reviewing
-description: Framework for reviewing and improving agent skills for quality, effectiveness, and compliance with the agent-skills standard. Use when auditing existing skills, providing feedback on skill PRs, improving skill descriptions, or troubleshooting underperforming skills.
+description: "Framework for reviewing and improving agent skills for quality, effectiveness, and compliance with the agent-skills standard. Use when auditing existing skills, providing feedback on skill PRs, improving skill descriptions, or troubleshooting underperforming skills."
 ---
 
 # Skill Review Guide

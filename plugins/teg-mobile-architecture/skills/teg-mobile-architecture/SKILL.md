@@ -1,6 +1,6 @@
 ---
 name: teg-mobile-architecture
-description: Enforce Transport Exchange Group (TEG) mobile architecture standards. Use this skill when designing new mobile features, structuring project folders, implementing architectural layers (UI, Use Case, Repository, Data Source), or reviewing PRs for compliance across Flutter, iOS, and Android.
+description: "Enforce Transport Exchange Group (TEG) mobile architecture standards. Use this skill when designing new mobile features, structuring project folders, implementing architectural layers (UI, Use Case, Repository, Data Source), or reviewing PRs for compliance across Flutter, iOS, and Android."
 ---
 
 # TEG Mobile Architecture

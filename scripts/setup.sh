@@ -3,8 +3,9 @@
 # setup.sh - Initialize the BD Skills repository for development
 #
 # This script:
-# 1. Installs git hooks for automatic skill syncing
+# 1. Installs git hooks for automatic skill and agent syncing
 # 2. Runs the initial skill sync
+# 3. Runs the initial agent sync
 #
 # Usage:
 #   ./scripts/setup.sh
@@ -56,14 +57,21 @@ print_info "Running initial skill sync..."
 "$REPO_ROOT/scripts/sync-skills.sh"
 
 echo ""
+
+# Run initial agent sync
+print_info "Running initial agent sync..."
+"$REPO_ROOT/scripts/sync-agents.sh"
+
+echo ""
 echo "=================================="
 echo "  Setup Complete!"
 echo "=================================="
 echo ""
-echo "Git hooks installed. Skills will auto-sync after:"
+echo "Git hooks installed. Skills and agents will auto-sync after:"
 echo "  - git checkout / git switch"
 echo "  - git pull / git merge"
 echo ""
-echo "To manually sync skills, run:"
+echo "To manually sync, run:"
 echo "  ./scripts/sync-skills.sh"
+echo "  ./scripts/sync-agents.sh"
 echo ""

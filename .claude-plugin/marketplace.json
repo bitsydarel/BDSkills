@@ -57,6 +57,13 @@
       "version": "1.0.0",
       "source": "./plugins/teg-mobile-architecture",
       "category": "development"
+    },
+    {
+      "name": "bd-plan-reviewer",
+      "description": "Orchestrates comprehensive multi-lens plan review through 10 specialized review skills — Product Leadership, Product Manager, Product Marketing, Business Analyst, Product Designer, Product Owner, Software Architecture, Test Design, Quality Assurance, and Clean Code Writing.",
+      "version": "1.0.0",
+      "source": "./plugins/bd-plan-reviewer",
+      "category": "productivity"
     }
   ]
 }

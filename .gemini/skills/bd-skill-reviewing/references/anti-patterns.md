@@ -44,7 +44,33 @@ description: Does things.
 
 **Fix:** Rewrite with specific WHAT + WHEN format:
 ```yaml
-description: Extracts text from PDF files, fills forms, merges documents. Use when working with PDFs or when the user mentions document extraction.
+description: "Extracts text from PDF files, fills forms, merges documents. Use when working with PDFs or when the user mentions document extraction."
+```
+
+---
+
+### 2b. Unquoted Description Value
+
+**Signs:**
+- Description value is not wrapped in double quotes
+- Description contains colons (e.g., `Triggers:`, `e.g.:`, `Note:`) that YAML interprets as mapping keys
+- Skill fails to load with "invalid YAML: mapping values are not allowed in this context"
+
+**Impact:** Skill fails to load entirely — YAML parser rejects the frontmatter
+
+**Detection:**
+```bash
+# Check if description is properly quoted
+grep "^description:" SKILL.md | grep -q '^description: "' && echo "OK" || echo "UNQUOTED"
+```
+
+**Fix:** Always wrap description values in double quotes:
+```yaml
+# Bad — will break if value contains a colon
+description: Guide for setup. Triggers: new repo, onboarding.
+
+# Good — safe regardless of content
+description: "Guide for setup. Use when setting up a new repo or onboarding."
 ```
 
 ---
@@ -282,6 +308,7 @@ For scanned PDFs requiring OCR, use pdf2image with pytesseract instead.
 <AntiPatternSummary>
   <Pattern name="Name Mismatch" severity="Critical" />
   <Pattern name="Vague Description" severity="Critical" />
+  <Pattern name="Unquoted Description" severity="Critical" />
   <Pattern name="Information Overload" severity="Major" />
   <Pattern name="Missing Triggers" severity="Major" />
   <Pattern name="Deep Nesting" severity="Major" />

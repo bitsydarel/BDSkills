@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# post-checkout hook - Run sync-skills.sh after checkout
+# post-checkout hook - Run sync-skills.sh and sync-agents.sh after checkout
 #
 # Git runs this hook after:
 # - git checkout
@@ -11,6 +11,9 @@
 #   $1 = ref of previous HEAD
 #   $2 = ref of new HEAD
 #   $3 = 1 if checking out a branch, 0 if checking out a file
+#
+# Note: Sync scripts run sequentially — they share the plugins/ directory
+# and must not race each other.
 
 # Only run on branch checkouts, not file checkouts
 if [ "$3" != "1" ]; then
@@ -18,10 +21,23 @@ if [ "$3" != "1" ]; then
 fi
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
-SYNC_SCRIPT="$REPO_ROOT/scripts/sync-skills.sh"
 
-if [ -x "$SYNC_SCRIPT" ]; then
+SYNC_SKILLS="$REPO_ROOT/scripts/sync-skills.sh"
+if [ -x "$SYNC_SKILLS" ]; then
     echo "Running skills sync after checkout..."
-    "$SYNC_SCRIPT" > /dev/null 2>&1
-    echo "Skills synchronized."
+    if "$SYNC_SKILLS" > /dev/null; then
+        echo "Skills synchronized."
+    else
+        echo "Warning: skill sync failed. Run ./scripts/sync-skills.sh manually." >&2
+    fi
+fi
+
+SYNC_AGENTS="$REPO_ROOT/scripts/sync-agents.sh"
+if [ -x "$SYNC_AGENTS" ]; then
+    echo "Running agents sync after checkout..."
+    if "$SYNC_AGENTS" > /dev/null; then
+        echo "Agents synchronized."
+    else
+        echo "Warning: agent sync failed. Run ./scripts/sync-agents.sh manually." >&2
+    fi
 fi

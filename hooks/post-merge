@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# post-merge hook - Run sync-skills.sh after merge
+# post-merge hook - Run sync-skills.sh and sync-agents.sh after merge
 #
 # Git runs this hook after:
 # - git merge
@@ -8,12 +8,28 @@
 #
 # Arguments:
 #   $1 = flag indicating whether the merge was a squash merge
+#
+# Note: Sync scripts run sequentially — they share the plugins/ directory
+# and must not race each other.
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
-SYNC_SCRIPT="$REPO_ROOT/scripts/sync-skills.sh"
 
-if [ -x "$SYNC_SCRIPT" ]; then
+SYNC_SKILLS="$REPO_ROOT/scripts/sync-skills.sh"
+if [ -x "$SYNC_SKILLS" ]; then
     echo "Running skills sync after merge..."
-    "$SYNC_SCRIPT" > /dev/null 2>&1
-    echo "Skills synchronized."
+    if "$SYNC_SKILLS" > /dev/null; then
+        echo "Skills synchronized."
+    else
+        echo "Warning: skill sync failed. Run ./scripts/sync-skills.sh manually." >&2
+    fi
+fi
+
+SYNC_AGENTS="$REPO_ROOT/scripts/sync-agents.sh"
+if [ -x "$SYNC_AGENTS" ]; then
+    echo "Running agents sync after merge..."
+    if "$SYNC_AGENTS" > /dev/null; then
+        echo "Agents synchronized."
+    else
+        echo "Warning: agent sync failed. Run ./scripts/sync-agents.sh manually." >&2
+    fi
 fi

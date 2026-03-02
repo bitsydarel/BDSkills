@@ -1,6 +1,6 @@
 ---
 name: bd-skill-creating
-description: Step-by-step guide for creating effective agent skills following the open agent-skills standard. Use when scaffolding new skills, writing SKILL.md files, organizing reference documentation, or preparing skills for publication.
+description: "Step-by-step guide for creating effective agent skills following the open agent-skills standard. Use when scaffolding new skills, writing SKILL.md files, organizing reference documentation, or preparing skills for publication."
 ---
 
 # Skill Creation Guide

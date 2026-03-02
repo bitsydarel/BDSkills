@@ -9,7 +9,7 @@ Complete specification for SKILL.md files and skill directory structure.
 ```yaml
 ---
 name: skill-name
-description: What this skill does. Use when [trigger conditions].
+description: "What this skill does. Use when [trigger conditions]."
 ---
 ```
 
@@ -23,7 +23,7 @@ description: What this skill does. Use when [trigger conditions].
 ```yaml
 ---
 name: skill-name
-description: Description here.
+description: "Description here."
 license: Apache-2.0
 compatibility: Requires git and docker
 metadata:
@@ -64,16 +64,18 @@ Must include:
 1. **WHAT**: Capabilities the skill provides
 2. **WHEN**: Trigger conditions for activation
 
+**Always quote description values with double quotes** to prevent YAML parse errors. Unquoted values containing colons (e.g., `Triggers: ...`) will break YAML parsing because the parser interprets `word:` as a mapping key.
+
 **Good example:**
 ```yaml
-description: Extracts text and tables from PDF files, fills forms, merges documents. Use when working with PDFs or when the user mentions document extraction.
+description: "Extracts text and tables from PDF files, fills forms, merges documents. Use when working with PDFs or when the user mentions document extraction."
 ```
 
 **Bad examples:**
 ```yaml
 description: Helps with PDFs.                    # Too vague
 description: I can help you process documents.  # First person
-description: You can use this for documents.    # Second person
+description: Triggers: new repo, restructuring.  # Unquoted colon breaks YAML
 ```
 
 ## Directory Structure

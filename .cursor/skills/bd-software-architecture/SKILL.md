@@ -1,6 +1,6 @@
 ---
 name: bd-software-architecture
-description: Architectural enforcement for software design. Use this skill when, Designing the folder structure of a new feature, Deciding where specific business logic belongs (e.g., Repository vs Service), Refactoring legacy code or breaking monoliths, Reviewing PRs for dependency violations or circular references. Applies to Mobile, Web, Backend, AI/ML, CLI, and Desktop.
+description: "Architectural enforcement for software design. Use this skill when designing the folder structure of a new feature, deciding where specific business logic belongs (e.g., Repository vs Service), refactoring legacy code or breaking monoliths, or reviewing PRs for dependency violations or circular references. Applies to Mobile, Web, Backend, AI/ML, CLI, and Desktop."
 ---
 
 # Software Architecture Guide

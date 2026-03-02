@@ -15,6 +15,7 @@ Comprehensive checklist for reviewing agent skills.
     <Check>Name does not start/end with hyphen</Check>
     <Check>Description field is present</Check>
     <Check>Description is 1-1024 characters</Check>
+    <Check>Description value is quoted with double quotes</Check>
     <Check>SKILL.md is under 500 lines</Check>
   </Category>
 
@@ -95,6 +96,10 @@ grep "^name:" SKILL.md | head -1
 # Check description exists and has content
 grep "^description:" SKILL.md | head -1
 # Should be 10+ words, include "Use when"
+
+# Check description is quoted (prevents YAML parse errors from colons)
+grep "^description:" SKILL.md | grep -q '^description: "' && echo "OK: quoted" || echo "FAIL: unquoted"
+# Must be wrapped in double quotes
 ```
 
 ### Structure Validation

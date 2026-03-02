@@ -1,324 +1,582 @@
 #!/bin/bash
 #
-# sync-skills.sh - Synchronize skills from canonical source to all agent tool locations
+# sync-skills.sh - Synchronize skills from canonical source to agent tool locations
 #
-# This script ensures all agent tools (OpenCode, Cursor, Gemini CLI, Plugin Marketplace)
-# have access to the same skills by creating hard links from a single source of truth.
+# Syncs skills from the canonical 'skills/' directory using hard links.
+# Two scopes control which targets are synced:
+#
+#   Project-level (--project): repo-local directories owned by this script
+#     .opencode/skill, .cursor/skills, .gemini/skills, .github/skills, plugins/
+#     Stale skills are pruned (these dirs are fully managed).
+#
+#   User-level (default): user-home directories shared with other tools
+#     ~/.config/opencode/skills, ~/.gemini/skills, ~/.copilot/skills,
+#     ~/.claude/skills, ~/.agents/skills
+#     Only managed skills are updated — external skills are never deleted.
 #
 # Usage:
-#   ./scripts/sync-skills.sh          # Run from repo root
-#   ./scripts/sync-skills.sh --status # Show current status without making changes
-#   ./scripts/sync-skills.sh --help   # Show help
+#   ./scripts/sync-skills.sh                    # Sync user-level only (default)
+#   ./scripts/sync-skills.sh --project          # Sync project-level only
+#   ./scripts/sync-skills.sh --all              # Sync both project + user
+#   ./scripts/sync-skills.sh --status           # Status for user targets (default)
+#   ./scripts/sync-skills.sh --status --project # Status for project targets
+#   ./scripts/sync-skills.sh --status --all     # Status for all targets
+#   ./scripts/sync-skills.sh -v                 # Verbose output (shows every ln)
+#   ./scripts/sync-skills.sh --help             # Show help
 #
-# The canonical source is the 'skills/' directory at the repo root.
-# All other locations use hard links to the skill directory contents.
 
 set -euo pipefail
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# ── Configuration ─────────────────────────────────────────────────────────────
 
-# Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-
-# Canonical source directory
 SKILLS_DIR="$REPO_ROOT/skills"
 
-# Target directories for hard links
-declare -a TARGETS=(
+# Project-level targets (relative to REPO_ROOT)
+declare -a PROJECT_TARGETS=(
+    ".agent/skills"
     ".opencode/skill"
     ".cursor/skills"
     ".gemini/skills"
     ".github/skills"
 )
 
-# Function to print colored output
-print_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
+# User-level targets (absolute paths)
+# Sources:
+#   OpenCode:        https://opencode.ai/docs/skills/
+#   Gemini CLI:      https://geminicli.com/docs/cli/skills/
+#   GitHub Copilot:  https://docs.github.com/en/copilot/concepts/agents/about-agent-skills
+#   Claude Code:     https://code.claude.com/docs/en/skills
+#   Cross-platform:  ~/.agents/skills/ (recognized by OpenCode + Gemini CLI)
+#   Cursor:          No file-based user-level skills (configured via Settings UI)
+declare -a USER_TARGETS=(
+    "$HOME/.config/opencode/skills"
+    "$HOME/.gemini/skills"
+    "$HOME/.copilot/skills"
+    "$HOME/.claude/skills"
+    "$HOME/.agents/skills"
+)
+
+# ── Colors ────────────────────────────────────────────────────────────────────
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+if [[ -n "${NO_COLOR:-}" ]] || [[ ! -t 1 ]]; then
+    RED='' GREEN='' YELLOW='' BLUE='' NC=''
+fi
+
+# ── Globals ───────────────────────────────────────────────────────────────────
+
+VERBOSE=false
+
+# ── Output helpers ────────────────────────────────────────────────────────────
+
+print_info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
 print_success() { echo -e "${GREEN}[OK]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+print_error()   { echo -e "${RED}[ERROR]${NC} $1"; }
 
-# Function to show help
-show_help() {
-    cat << EOF
-BD Skills Sync Script
-=====================
+# ── Core helpers ──────────────────────────────────────────────────────────────
 
-Synchronizes skills from the canonical 'skills/' directory to all agent tool locations.
-
-Usage:
-    $0              Sync all skills (clean and recreate hard links)
-    $0 --status     Show current status without making changes
-    $0 --help       Show this help message
-
-Supported Agent Tools:
-    - OpenCode      (.opencode/skill/)
-    - Cursor        (.cursor/skills/)
-    - Gemini CLI    (.gemini/skills/)
-    - GitHub        (.github/skills/)
-    - Plugin Marketplace (plugins/*/skills/*/)
-
-The canonical source is: skills/
-All other locations use hard links to the skill directory contents in the canonical source.
-
-Note: Hard links ensure all tools can read the files directly (unlike symlinks which
-some tools may not follow).
-
-EOF
-}
-
-# Function to check if two files are hard-linked (same inode)
-are_hardlinked() {
-    local file1="$1"
-    local file2="$2"
-    
-    if [[ ! -f "$file1" ]] || [[ ! -f "$file2" ]]; then
-        return 1
-    fi
-    
-    local inode1=$(stat -f "%i" "$file1" 2>/dev/null || stat -c "%i" "$file1" 2>/dev/null)
-    local inode2=$(stat -f "%i" "$file2" 2>/dev/null || stat -c "%i" "$file2" 2>/dev/null)
-    
-    [[ "$inode1" == "$inode2" ]]
-}
-
-# Function to show current status
-show_status() {
-    print_info "Checking skills synchronization status..."
-    echo ""
-    
-    # Check canonical source
-    echo "Canonical Source: $SKILLS_DIR"
-    if [[ -d "$SKILLS_DIR" ]]; then
-        local skill_count=$(find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')
-        print_success "Found $skill_count skills:"
-        for skill_dir in "$SKILLS_DIR"/*/; do
-            if [[ -d "$skill_dir" ]]; then
-                local skill_name=$(basename "$skill_dir")
-                echo "        - $skill_name"
-            fi
-        done
-    else
-        print_error "Skills directory not found!"
-        return 1
-    fi
-    echo ""
-    
-    # Check each target
-    for target in "${TARGETS[@]}"; do
-        local target_path="$REPO_ROOT/$target"
-        echo "Target: $target"
-        if [[ -d "$target_path" ]]; then
-            local link_count=0
-            local broken_count=0
-            for skill_dir in "$target_path"/*/; do
-                if [[ -d "$skill_dir" ]]; then
-                    local skill_name=$(basename "$skill_dir")
-                    local target_file="$skill_dir/SKILL.md"
-                    local source_file="$SKILLS_DIR/$skill_name/SKILL.md"
-                    
-                    if [[ -f "$target_file" ]]; then
-                        if are_hardlinked "$source_file" "$target_file"; then
-                            ((link_count++))
-                        else
-                            ((broken_count++))
-                        fi
-                    else
-                        ((broken_count++))
-                    fi
-                fi
-            done
-            if [[ $broken_count -gt 0 ]]; then
-                print_warning "$link_count valid hard links, $broken_count need sync"
-            elif [[ $link_count -gt 0 ]]; then
-                print_success "$link_count hard links OK"
-            else
-                print_warning "No skills found"
-            fi
-        else
-            print_warning "Directory does not exist"
-        fi
-    done
-    echo ""
-    
-    # Check plugins
-    echo "Target: plugins/*/skills/*/"
-    local plugin_ok=0
-    local plugin_broken=0
-    for plugin_dir in "$REPO_ROOT"/plugins/*/; do
-        if [[ -d "$plugin_dir" ]]; then
-            local plugin_name=$(basename "$plugin_dir")
-            local target_file="$plugin_dir/skills/$plugin_name/SKILL.md"
-            local source_file="$SKILLS_DIR/$plugin_name/SKILL.md"
-            
-            if [[ -f "$target_file" ]]; then
-                if are_hardlinked "$source_file" "$target_file"; then
-                    ((plugin_ok++))
-                else
-                    ((plugin_broken++))
-                fi
-            else
-                ((plugin_broken++))
-            fi
-        fi
-    done
-    if [[ $plugin_broken -gt 0 ]]; then
-        print_warning "$plugin_ok valid hard links, $plugin_broken need sync"
-    elif [[ $plugin_ok -gt 0 ]]; then
-        print_success "$plugin_ok hard links OK"
-    else
-        print_warning "No plugins found"
-    fi
-}
-
-# Function to clean a target directory (remove contents, keep directory)
-clean_target() {
-    local target="$1"
-    if [[ -d "$target" ]]; then
-        # Remove all contents (files, directories, and symlinks)
-        rm -rf "$target"/*
-    fi
-}
-
-# Function to sync skills using hard links
-sync_skills() {
-    print_info "Starting skills synchronization (using hard links)..."
-    echo ""
-    
-    # Verify canonical source exists
-    if [[ ! -d "$SKILLS_DIR" ]]; then
-        print_error "Canonical skills directory not found: $SKILLS_DIR"
-        exit 1
-    fi
-    
-    # Get list of skills
+# get_skills — prints skill names from canonical source, one per line
+get_skills() {
     local skills=()
     for skill_dir in "$SKILLS_DIR"/*/; do
         if [[ -d "$skill_dir" ]]; then
             skills+=("$(basename "$skill_dir")")
         fi
     done
-    
     if [[ ${#skills[@]} -eq 0 ]]; then
-        print_error "No skills found in $SKILLS_DIR"
-        exit 1
+        return 1
     fi
-    
-    print_info "Found ${#skills[@]} skills to sync: ${skills[*]}"
-    echo ""
-    
-    # Sync to each target directory
-    for target in "${TARGETS[@]}"; do
-        local target_path="$REPO_ROOT/$target"
-        print_info "Syncing to $target..."
-        
-        # Clean existing content
-        clean_target "$target_path"
-        
-        # Create hard links for each skill
-        for skill_name in "${skills[@]}"; do
-            local source_skill_dir="$SKILLS_DIR/$skill_name"
-            local target_skill_dir="$target_path/$skill_name"
-            
-            # Create skill directory
-            mkdir -p "$target_skill_dir"
-            
-            # Hard link all files and replicate directories (skip hidden paths and symlinks)
-            while IFS= read -r source_path; do
-                local source_prefix="$source_skill_dir/"
-                local relative_path="${source_path#$source_prefix}"
-                local target_item_path="$target_skill_dir/$relative_path"
+    printf '%s\n' "${skills[@]}"
+}
 
-                if [[ -d "$source_path" ]]; then
-                    mkdir -p "$target_item_path"
-                elif [[ -f "$source_path" ]]; then
-                    mkdir -p "$(dirname "$target_item_path")"
-                    ln -f -v "$source_path" "$target_item_path"
-                fi
-            done < <(find "$source_skill_dir" -mindepth 1 \( -path '*/.*' -o -name '.*' \) -prune -o -type l -prune -o -type d -print -o -type f -print)
+# are_hardlinked file1 file2 — returns 0 if same inode
+are_hardlinked() {
+    local file1="$1" file2="$2"
+    if [[ ! -f "$file1" ]] || [[ ! -f "$file2" ]]; then
+        return 1
+    fi
+    local inode1 inode2
+    inode1=$(stat -f "%i" "$file1" 2>/dev/null || stat -c "%i" "$file1" 2>/dev/null)
+    inode2=$(stat -f "%i" "$file2" 2>/dev/null || stat -c "%i" "$file2" 2>/dev/null)
+    [[ "$inode1" == "$inode2" ]]
+}
+
+# hardlink_skill source_dir target_dir — hard-links all files from one skill
+hardlink_skill() {
+    local source_dir="$1" target_dir="$2"
+
+    # Clean target and recreate
+    rm -rf "$target_dir"
+    mkdir -p "$target_dir"
+
+    local ln_flags="-f"
+    if $VERBOSE; then
+        ln_flags="-f -v"
+    fi
+
+    while IFS= read -r source_path; do
+        local relative_path="${source_path#"$source_dir"/}"
+        local target_path="$target_dir/$relative_path"
+
+        if [[ -d "$source_path" ]]; then
+            mkdir -p "$target_path"
+        elif [[ -f "$source_path" ]]; then
+            mkdir -p "$(dirname "$target_path")"
+            ln $ln_flags "$source_path" "$target_path"
+        fi
+    done < <(find "$source_dir" -mindepth 1 \
+        \( -path '*/.*' -o -name '.*' \) -prune \
+        -o -type l -prune \
+        -o -type d -print \
+        -o -type f -print)
+}
+
+# prune_stale_skills target_path skills... — removes dirs not in skills list
+prune_stale_skills() {
+    local target_path="$1"
+    shift
+    local skills=("$@")
+
+    if [[ ! -d "$target_path" ]]; then
+        return 0
+    fi
+
+    for existing_dir in "$target_path"/*/; do
+        if [[ ! -d "$existing_dir" ]]; then
+            continue
+        fi
+        local name
+        name=$(basename "$existing_dir")
+        local found=false
+        for skill in "${skills[@]}"; do
+            if [[ "$skill" == "$name" ]]; then
+                found=true
+                break
+            fi
         done
-        
-        print_success "Created ${#skills[@]} skill directories with hard links in $target"
+        if ! $found; then
+            print_warning "Removing stale: $name"
+            rm -rf "$existing_dir"
+        fi
+    done
+}
+
+# ── Sync functions ────────────────────────────────────────────────────────────
+
+# sync_target target_path label prune skills...
+# Generic sync for flat-layout targets.
+sync_target() {
+    local target_path="$1" label="$2" prune="$3"
+    shift 3
+    local skills=("$@")
+
+    mkdir -p "$target_path"
+
+    if [[ "$prune" == "true" ]]; then
+        prune_stale_skills "$target_path" "${skills[@]}"
+    fi
+
+    local count=0
+    for skill_name in "${skills[@]}"; do
+        hardlink_skill "$SKILLS_DIR/$skill_name" "$target_path/$skill_name"
+        ((count++))
     done
 
-    # Prune plugins that do not map to canonical skills
-    for plugin_dir in "$REPO_ROOT"/plugins/*/; do
-        if [[ -d "$plugin_dir" ]]; then
-            local plugin_name=$(basename "$plugin_dir")
-            local found=0
+    print_success "$label — $count skills synced"
+}
 
-            for skill_name in "${skills[@]}"; do
-                if [[ "$skill_name" == "$plugin_name" ]]; then
-                    found=1
+# sync_plugins skills... — dedicated sync for nested plugin layout
+sync_plugins() {
+    local skills=("$@")
+    local plugins_dir="$REPO_ROOT/plugins"
+
+    # Prune plugins not in canonical source
+    if [[ -d "$plugins_dir" ]]; then
+        for plugin_dir in "$plugins_dir"/*/; do
+            if [[ ! -d "$plugin_dir" ]]; then
+                continue
+            fi
+            local plugin_name
+            plugin_name=$(basename "$plugin_dir")
+            local found=false
+            for skill in "${skills[@]}"; do
+                if [[ "$skill" == "$plugin_name" ]]; then
+                    found=true
                     break
                 fi
             done
-
-            if [[ $found -eq 0 ]]; then
-                print_warning "Removing unknown plugin directory: $plugin_name"
+            if ! $found; then
+                print_warning "Removing stale plugin: $plugin_name"
                 rm -rf "$plugin_dir"
             fi
-        fi
-    done
-    echo ""
-    
-    # Sync to plugins directory
-    print_info "Syncing to plugins/*/skills/*/..."
-    
-    for skill_name in "${skills[@]}"; do
-        local plugin_dir="$REPO_ROOT/plugins/$skill_name"
-        local skills_subdir="$plugin_dir/skills/$skill_name"
-        local source_skill_dir="$SKILLS_DIR/$skill_name"
-        
-        # Create plugin directory structure
-        mkdir -p "$skills_subdir"
-        
-        # Remove existing files
-        rm -rf "$skills_subdir"/*
-        
-        # Hard link all files and replicate directories (skip hidden paths and symlinks)
-        while IFS= read -r source_path; do
-            local source_prefix="$source_skill_dir/"
-            local relative_path="${source_path#$source_prefix}"
-            local target_item_path="$skills_subdir/$relative_path"
+        done
+    fi
 
-            if [[ -d "$source_path" ]]; then
-                mkdir -p "$target_item_path"
-            elif [[ -f "$source_path" ]]; then
-                mkdir -p "$(dirname "$target_item_path")"
-                ln -f -v "$source_path" "$target_item_path"
-            fi
-        done < <(find "$source_skill_dir" -mindepth 1 \( -path '*/.*' -o -name '.*' \) -prune -o -type l -prune -o -type d -print -o -type f -print)
+    local count=0
+    for skill_name in "${skills[@]}"; do
+        local target="$plugins_dir/$skill_name/skills/$skill_name"
+        mkdir -p "$target"
+        hardlink_skill "$SKILLS_DIR/$skill_name" "$target"
+        ((count++))
     done
-    
-    print_success "Created ${#skills[@]} skill directories with hard links in plugins/"
-    echo ""
-    
-    print_success "Skills synchronization complete!"
+
+    print_success "plugins/ — $count skills synced"
 }
 
-# Main entry point
+# sync_project — syncs all project-level targets
+sync_project() {
+    local skills
+    local IFS=$'\n'
+    skills=($(get_skills))
+    unset IFS
+
+    echo ""
+    echo "── Project Targets ─────────────────"
+
+    for target in "${PROJECT_TARGETS[@]}"; do
+        local target_path="$REPO_ROOT/$target"
+        if ! sync_target "$target_path" "$target" "true" "${skills[@]}"; then
+            print_warning "Failed to sync $target (continuing)"
+        fi
+    done
+
+    if ! sync_plugins "${skills[@]}"; then
+        print_warning "Failed to sync plugins/ (continuing)"
+    fi
+}
+
+# sync_user — syncs all user-level targets (no pruning)
+sync_user() {
+    local skills
+    local IFS=$'\n'
+    skills=($(get_skills))
+    unset IFS
+
+    echo ""
+    echo "── User Targets ────────────────────"
+
+    for target_path in "${USER_TARGETS[@]}"; do
+        local label="${target_path/#$HOME/~}"
+
+        if [[ ! -d "$target_path" ]]; then
+            print_info "Creating $label (first sync)"
+        fi
+
+        if ! sync_target "$target_path" "$label" "false" "${skills[@]}"; then
+            print_warning "Failed to sync $label (continuing)"
+        fi
+    done
+}
+
+# ── Status functions ──────────────────────────────────────────────────────────
+
+# check_target_status target_path label — checks hard link health for flat target
+# Returns 0 if healthy, 2 if needs sync
+check_target_status() {
+    local target_path="$1" label="$2"
+
+    echo "Target: $label"
+
+    if [[ ! -d "$target_path" ]]; then
+        print_warning "Directory does not exist"
+        return 2
+    fi
+
+    local link_count=0
+    local broken_names=()
+
+    local skills
+    local IFS=$'\n'
+    skills=($(get_skills))
+    unset IFS
+
+    for skill_name in "${skills[@]}"; do
+        local target_file="$target_path/$skill_name/SKILL.md"
+        local source_file="$SKILLS_DIR/$skill_name/SKILL.md"
+
+        if [[ -f "$target_file" ]] && are_hardlinked "$source_file" "$target_file"; then
+            ((link_count++))
+        else
+            broken_names+=("$skill_name")
+        fi
+    done
+
+    if [[ ${#broken_names[@]} -gt 0 ]]; then
+        local broken_list
+        broken_list=$(printf '%s, ' "${broken_names[@]}")
+        broken_list="${broken_list%, }"
+        print_warning "$link_count valid, ${#broken_names[@]} need sync: $broken_list"
+        return 2
+    elif [[ $link_count -gt 0 ]]; then
+        print_success "$link_count hard links OK"
+        return 0
+    else
+        print_warning "No skills found"
+        return 2
+    fi
+}
+
+# check_plugins_status — checks hard link health for plugin layout
+# Returns 0 if healthy, 2 if needs sync
+check_plugins_status() {
+    echo "Target: plugins/*/skills/*/"
+
+    local ok_count=0
+    local broken_names=()
+
+    local skills
+    local IFS=$'\n'
+    skills=($(get_skills))
+    unset IFS
+
+    for skill_name in "${skills[@]}"; do
+        local target_file="$REPO_ROOT/plugins/$skill_name/skills/$skill_name/SKILL.md"
+        local source_file="$SKILLS_DIR/$skill_name/SKILL.md"
+
+        if [[ -f "$target_file" ]] && are_hardlinked "$source_file" "$target_file"; then
+            ((ok_count++))
+        else
+            broken_names+=("$skill_name")
+        fi
+    done
+
+    if [[ ${#broken_names[@]} -gt 0 ]]; then
+        local broken_list
+        broken_list=$(printf '%s, ' "${broken_names[@]}")
+        broken_list="${broken_list%, }"
+        print_warning "$ok_count valid, ${#broken_names[@]} need sync: $broken_list"
+        return 2
+    elif [[ $ok_count -gt 0 ]]; then
+        print_success "$ok_count hard links OK"
+        return 0
+    else
+        print_warning "No plugins found"
+        return 2
+    fi
+}
+
+# show_source_status — displays canonical source skill list
+show_source_status() {
+    echo "Canonical Source: $SKILLS_DIR"
+
+    if [[ ! -d "$SKILLS_DIR" ]]; then
+        print_error "Skills directory not found!"
+        return 1
+    fi
+
+    local skills
+    local IFS=$'\n'
+    skills=($(get_skills))
+    unset IFS
+
+    print_success "Found ${#skills[@]} skills:"
+    for skill in "${skills[@]}"; do
+        echo "        - $skill"
+    done
+    echo ""
+}
+
+# show_project_status — status for project-level targets
+# Returns 0 if all healthy, 2 if any need sync
+show_project_status() {
+    echo "── Project Targets ─────────────────"
+
+    local needs_sync=false
+
+    for target in "${PROJECT_TARGETS[@]}"; do
+        if ! check_target_status "$REPO_ROOT/$target" "$target"; then
+            needs_sync=true
+        fi
+    done
+
+    if ! check_plugins_status; then
+        needs_sync=true
+    fi
+
+    if $needs_sync; then
+        return 2
+    fi
+    return 0
+}
+
+# show_user_status — status for user-level targets
+# Returns 0 if all healthy, 2 if any need sync
+show_user_status() {
+    echo "── User Targets ────────────────────"
+
+    local needs_sync=false
+
+    for target_path in "${USER_TARGETS[@]}"; do
+        local label="${target_path/#$HOME/~}"
+        if ! check_target_status "$target_path" "$label"; then
+            needs_sync=true
+        fi
+    done
+
+    if $needs_sync; then
+        return 2
+    fi
+    return 0
+}
+
+# ── Help ──────────────────────────────────────────────────────────────────────
+
+show_help() {
+    cat << 'EOF'
+BD Skills Sync Script
+=====================
+
+Synchronizes skills from the canonical 'skills/' directory to agent tool
+locations using hard links.
+
+Usage:
+    sync-skills.sh                        Sync user-level targets (default)
+    sync-skills.sh --project              Sync project-level targets only
+    sync-skills.sh --all                  Sync both project + user targets
+    sync-skills.sh --status               Show status for user targets (default)
+    sync-skills.sh --status --project     Show status for project targets
+    sync-skills.sh --status --all         Show status for all targets
+    sync-skills.sh -v, --verbose          Show individual link operations
+    sync-skills.sh -h, --help             Show this help message
+
+Scopes:
+    Project targets (--project):
+        .agent/skills/           Agent
+        .opencode/skill/         OpenCode
+        .cursor/skills/          Cursor
+        .gemini/skills/          Gemini CLI
+        .github/skills/          GitHub Copilot
+        plugins/*/skills/*/      Plugin Marketplace
+        Stale skills are pruned (these dirs are fully managed by this script).
+
+    User targets (default):
+        ~/.config/opencode/skills/   OpenCode (user-level)
+        ~/.gemini/skills/            Gemini CLI (user-level)
+        ~/.copilot/skills/           GitHub Copilot (user-level)
+        ~/.claude/skills/            Claude Code (user-level)
+        ~/.agents/skills/            Cross-platform (OpenCode + Gemini CLI)
+        Only managed skills are updated — external skills are never deleted.
+
+Exit codes:
+    0   All targets healthy / sync succeeded
+    1   Fatal error (source missing, no skills found)
+    2   Partial failure or targets need sync
+
+Environment:
+    NO_COLOR    Disable colored output
+    VERBOSE     Show individual link operations (same as -v)
+
+EOF
+}
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+
 main() {
     cd "$REPO_ROOT"
-    
-    case "${1:-}" in
-        --help|-h)
-            show_help
-            ;;
-        --status|-s)
-            show_status
-            ;;
-        *)
-            sync_skills
-            echo ""
-            show_status
-            ;;
-    esac
+
+    # Argument parsing
+    local do_status=false
+    local scope="user"
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --help|-h)
+                show_help
+                return 0
+                ;;
+            --status|-s)
+                do_status=true
+                ;;
+            --project)
+                if [[ "$scope" == "user" ]]; then
+                    scope="project"
+                else
+                    scope="all"
+                fi
+                ;;
+            --all)
+                scope="all"
+                ;;
+            --verbose|-v)
+                VERBOSE=true
+                ;;
+            *)
+                print_error "Unknown option: $1"
+                echo "Run with --help for usage."
+                return 1
+                ;;
+        esac
+        shift
+    done
+
+    # Validate source
+    if [[ ! -d "$SKILLS_DIR" ]]; then
+        print_error "Canonical skills directory not found: $SKILLS_DIR"
+        return 1
+    fi
+
+    if ! get_skills > /dev/null; then
+        print_error "No skills found in $SKILLS_DIR"
+        return 1
+    fi
+
+    if $do_status; then
+        # ── Status mode ──
+        show_source_status || return 1
+
+        local exit_code=0
+
+        case "$scope" in
+            project)
+                print_info "Scope: project"
+                echo ""
+                show_project_status || exit_code=2
+                ;;
+            user)
+                show_user_status || exit_code=2
+                ;;
+            all)
+                print_info "Scope: all"
+                echo ""
+                show_project_status || exit_code=2
+                echo ""
+                show_user_status || exit_code=2
+                ;;
+        esac
+
+        return $exit_code
+    else
+        # ── Sync mode ──
+        local skill_count
+        skill_count=$(get_skills | wc -l | tr -d ' ')
+        print_info "Found $skill_count skills to sync"
+
+        case "$scope" in
+            project)
+                print_info "Scope: project (use default for user-level targets)"
+                sync_project
+                ;;
+            user)
+                sync_user
+                ;;
+            all)
+                print_info "Scope: all (project + user)"
+                sync_project
+                sync_user
+                ;;
+        esac
+
+        echo ""
+        print_success "Sync complete!"
+    fi
 }
 
 main "$@"

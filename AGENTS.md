@@ -27,6 +27,25 @@ Naming: lowercase, hyphens only, directory name must match `name` in frontmatter
 
 Git hooks auto-sync on checkout/pull/merge.
 
+## Agent Structure
+
+Edit agents ONLY in `agents/<agent-name>/` - all other locations are auto-generated.
+
+Each agent directory:
+```
+agent-name/
+├── AGENT.md           # Required - agent system prompt (<500 lines)
+└── references/        # Optional - detailed orchestration docs
+```
+
+Agents are prompt-only orchestrations that coordinate multiple skills.
+Synced as flat `<name>.md` files to platform agent directories.
+
+```bash
+./scripts/sync-agents.sh          # Sync agents to all agent tools
+./scripts/sync-agents.sh --status # Check agent sync status
+```
+
 ## References
 
 - Spec: https://agentskills.io/specification

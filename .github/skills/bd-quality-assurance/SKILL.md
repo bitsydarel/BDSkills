@@ -1,6 +1,6 @@
 ---
 name: bd-quality-assurance
-description: Enforces code standards, validates release readiness, and guides pre-commit checks. Use when the user is finalizing features, preparing pull requests, running local CI checks, debugging build failures, or asking about code quality standards.
+description: "Enforces code standards, validates release readiness, and guides pre-commit checks. Use when the user is finalizing features, preparing pull requests, running local CI checks, debugging build failures, or asking about code quality standards."
 ---
 
 # Quality Assurance

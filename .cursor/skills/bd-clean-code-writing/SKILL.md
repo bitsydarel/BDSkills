@@ -1,6 +1,6 @@
 ---
 name: bd-clean-code-writing
-description: Workflow for generating, refactoring, and reviewing code with strict adherence to SOLID principles, separation of concerns, and type safety. Use when Writing new components, Refactoring legacy code, Splitting large classes, or Reviewing architecture.
+description: "Workflow for generating, refactoring, and reviewing code with strict adherence to SOLID principles, separation of concerns, and type safety. Use when Writing new components, Refactoring legacy code, Splitting large classes, or Reviewing architecture."
 ---
 
 # Clean Code Writing

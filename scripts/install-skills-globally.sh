@@ -20,7 +20,7 @@ YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-SCRIPT_DIR="$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 SKILLS_DIR="$REPO_ROOT/skills"
 
@@ -120,50 +120,8 @@ status_global() {
 
 clean_global_target() {
   local target="$1"
-  if [[ -d "$target" ]]; then rm -rf "$target"/*; fi
+  if [[ -d "$target" ]]; then find "$target" -mindepth 1 -delete; fi
   mkdir -p "$target"
-}
-
-sync_global() {
-  print_info "Starting global skills installation (using hard links)..."
-  if [[ ! -d "$SKILLS_DIR" ]]; then print_error "Canonical skills directory not found: $SKILLS_DIR"; exit 1; fi
-  local skills=()
-  for skill_dir in "$SKILLS_DIR"/*/; do
-    if [[ -d "$skill_dir" ]]; then skills+=("$(basename "$skill_dir")"); fi
-  done
-  if [[ ${#skills[@]} -eq 0 ]]; then print_error "No skills found in $SKILLS_DIR"; exit 1; fi
-  print_info "Found ${#skills[@]} skills to install globally: ${skills[*]}"
-  echo ""
-  for idx in ${!GLOBAL_TARGETS[@]}; do
-    target=$(expand_home "${GLOBAL_TARGETS[$idx]}")
-    tool="${TOOL_NAMES[$idx]}"
-    print_info "Syncing to $tool..."
-    clean_global_target "$target"
-    for skill_name in "${skills[@]}"; do
-      local source_skill_dir="$SKILLS_DIR/$skill_name"
-      local target_skill_dir="$target/$skill_name"
-      mkdir -p "$target_skill_dir"
-      while IFS= read -r source_path; do
-        local source_prefix="$source_skill_dir/"
-        local relative_path="${source_path#$source_prefix}"
-        local target_item_path="$target_skill_dir/$relative_path"
-        if [[ -d "$source_path" ]]; then
-          mkdir -p "$target_item_path"
-        elif [[ -f "$source_path" ]]; then
-          mkdir -p "$(dirname "$target_item_path")"
-           if ln -f -v "$source_path" "$target_item_path" 2>/dev/null; then
-             : # Hard link succeeded
-           else
-             cp -f "$source_path" "$target_item_path"
-             print_warning "Hard link failed for $source_path, copied instead."
-           fi
-         fi
-      done < <(find "$source_skill_dir" -mindepth 1 \( -path '*/.*' -o -name '.*' \) -prune -o -type l -prune -o -type d -print -o -type f -print)
-    done
-    print_success "Installed ${#skills[@]} skills in $tool"
-  done
-  echo ""
-  print_success "Global skills installation complete!"
 }
 
 verify_global_install() {
@@ -216,51 +174,6 @@ verify_global_install() {
   echo ""
 }
 
-main() {
-  cd "$REPO_ROOT"
-
-  DRY_RUN=0
-  VERBOSE=0
-  POSITIONAL=()
-  while [[ $# -gt 0 ]]; do
-    case "$1" in
-      --dry-run)
-        DRY_RUN=1
-        shift
-        ;;
-      --verbose|-v)
-        VERBOSE=1
-        shift
-        ;;
-      --help|-h)
-        show_help; exit 0;
-        ;;
-      --status|-s)
-        status_global; exit 0;
-        ;;
-      --verify)
-        verify_global_install; exit 0;
-        ;;
-      *)
-        POSITIONAL+=("$1")
-        shift
-        ;;
-    esac
-  done
-  set -- "${POSITIONAL[@]}"
-
-  # Directory check: ensure script is run from repo root and skills/ exists
-  if [[ ! -d "$SKILLS_DIR" ]]; then
-    echo -e "${RED}[ERROR]${NC} 'skills/' directory not found in repo root ($REPO_ROOT).\nPlease run this script from the repository root where the canonical skills/ directory exists."
-    exit 1
-  fi
-  sync_global
-  echo ""
-  status_global
-  verify_global_install
-}
-
-# Enhanced sync_global to honor DRY_RUN/VERBOSE
 sync_global() {
   print_info "Starting global skills installation (using hard links)..."
   if [[ ! -d "$SKILLS_DIR" ]]; then print_error "Canonical skills directory not found: $SKILLS_DIR"; exit 1; fi
@@ -319,6 +232,49 @@ sync_global() {
   done
   echo ""
   print_success "Global skills installation complete!"
+}
+
+main() {
+  cd "$REPO_ROOT"
+
+  DRY_RUN=0
+  VERBOSE=0
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --dry-run)
+        DRY_RUN=1
+        shift
+        ;;
+      --verbose|-v)
+        VERBOSE=1
+        shift
+        ;;
+      --help|-h)
+        show_help; exit 0;
+        ;;
+      --status|-s)
+        status_global; exit 0;
+        ;;
+      --verify)
+        verify_global_install; exit 0;
+        ;;
+      *)
+        print_error "Unknown option: $1"
+        echo "Run with --help for usage."
+        exit 1
+        ;;
+    esac
+  done
+
+  # Directory check: ensure script is run from repo root and skills/ exists
+  if [[ ! -d "$SKILLS_DIR" ]]; then
+    echo -e "${RED}[ERROR]${NC} 'skills/' directory not found in repo root ($REPO_ROOT).\nPlease run this script from the repository root where the canonical skills/ directory exists."
+    exit 1
+  fi
+  sync_global
+  echo ""
+  status_global
+  verify_global_install
 }
 
 main "$@"
