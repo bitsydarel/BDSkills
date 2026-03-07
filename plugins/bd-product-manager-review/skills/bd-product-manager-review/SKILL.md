@@ -1,6 +1,6 @@
 ---
 name: bd-product-manager-review
-description: "Reviews task plans, features, product proposals, and existing implementations through a Product Manager lens — evaluating problem validation, the four critical product risks (value, usability, feasibility, business viability), strategic alignment, success metrics, MVP strategy, prioritization, and ethical responsibility. Use when assessing a feature proposal, product spec, task plan, roadmap item, or reviewing an existing feature for PM-quality rigor."
+description: "Reviews task plans, features, product proposals, and existing implementations through a Product Manager lens."
 ---
 
 # Product Manager Review

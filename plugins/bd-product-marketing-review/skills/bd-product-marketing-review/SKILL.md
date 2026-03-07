@@ -1,6 +1,6 @@
 ---
 name: bd-product-marketing-review
-description: "Reviews task plans, features, product proposals, and existing implementations through a Product Marketing Manager lens — evaluating market understanding and buyer personas, positioning and messaging clarity, competitive differentiation, go-to-market strategy, sales enablement and cross-functional readiness, launch planning, market performance measurement, pricing and packaging strategy, channel strategy, and customer evidence and proof points. Use when assessing a feature proposal, product launch plan, GTM strategy, messaging framework, competitive positioning, or reviewing an existing feature or product for product marketing rigor."
+description: "Reviews task plans, features, product proposals, and existing implementations through a Product Marketing Manager lens."
 ---
 
 # Product Marketing Manager Review

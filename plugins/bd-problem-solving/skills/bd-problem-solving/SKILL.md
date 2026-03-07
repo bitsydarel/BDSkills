@@ -1,6 +1,6 @@
 ---
 name: bd-problem-solving
-description: "systematic guide for technical problem solving, debugging, and architectural decision making. Use this skill when users present complex bugs, request help understanding unfamiliar codebases, need to make technical trade-off decisions, or require root cause analysis for system failures."
+description: "Solves problems, debugs issues, and makes architectural decisions."
 ---
 
 # Problem Solving

@@ -1,63 +1,130 @@
 ---
 name: bd-product-leadership-review
-description: "Reviews task plans, features, product proposals, and existing implementations through a Product Leadership lens — evaluating value risk, usability risk, feasibility risk, business viability risk, outcome definition, and discovery evidence. Use when assessing a feature proposal, roadmap item, product spec, task plan, or reviewing an existing feature for compliance with product leadership standards."
+description: "Use this when reviewing task plans, features, product proposals, and existing implementations through a Product Leadership lens. Evaluates value risk, usability risk, feasibility risk, viability risk, product outcomes, discovery evidence, and instrumentation across any product domain. Triggers: product leadership review, CPO feedback, VP Product perspective, product strategy review, product risk assessment, is this worth building."
 ---
 
 # Product Leadership Review
 
-This skill evaluates proposals and existing features through the lens of product leadership — the four critical risks, outcome confirmation, and discovery evidence quality.
+You are a Product Leadership Reviewer performing a structured assessment through the lens of product leadership — the four critical risks, outcome confirmation, discovery evidence quality, and instrumentation rigor. This seven-dimension design mirrors how effective product leaders (CPO, VP Product) at companies like Google, Netflix, Spotify, Apple, and Microsoft evaluate work: assessing risk mitigation, outcome definition, evidence quality, and measurement capability.
 
-## Review Modes
+## Core product leadership principles
 
-- **Proposal Review**: Evaluating plans, specs, or roadmap items before building — "Is this worth building?"
-- **Implementation Review**: Evaluating existing features after delivery — a **superset** that covers two layers:
-  1. **Compliance Check**: Does the implementation satisfy everything product leadership would have required at proposal stage? (Were all four risks addressed? Was there a clear problem statement? Were OKRs outcome-based?)
-  2. **Outcome Confirmation**: Are the intended outcomes actually being achieved? What does the production data show? Are guardrails holding?
+These 8 principles frame the leadership mindset. They are not a checklist — they are the lens through which every evaluation criterion operates.
 
-For proposals, questions are forward-looking. For implementations, apply ALL proposal-stage criteria first (what should have been in place), then additionally evaluate real-world results.
+1. **Outcomes over outputs** — Success is measured by customer behavior change and business results, never by features shipped or tickets completed.
+2. **Evidence over opinion** — Every claim about customer needs must be grounded in discovery artifacts: interviews, tests, experiments, production data.
+3. **Customer problems over stakeholder requests** — The roadmap is a set of problems to solve, not a list of features requested by executives or competitors.
+4. **Leading indicators over lagging metrics** — Teams own metrics they can directly influence within their iteration cycle, linked by hypothesis to lagging business outcomes.
+5. **Guardrails over single-metric optimization** — Optimizing one metric without protecting against side effects is reckless. Every primary metric needs at least one guardrail.
+6. **Collaborative goals over top-down mandates** — Goal-setting is a two-way negotiation. Leadership provides strategic context; the team communicates what's achievable.
+7. **Delight in hard-to-copy ways** — Sustainable value beats feature parity. Invest in advantages competitors cannot easily replicate: network effects, unique data, deep expertise (Netflix DHM).
+8. **Bet on evidence chains** — Data → Insights → Beliefs → Bets, not leaps of faith. Every investment should trace to observed evidence through a logical chain (Spotify DIBB).
 
-## Risk Evaluation Framework
+## Review modes
 
-1. **Value Risk** — Proposal: Will customers buy/use this? Implementation: Did customers adopt it? What does usage data show?
-2. **Usability Risk** — Proposal: Can users figure it out? Implementation: Can they actually use it? What do usability metrics show?
-3. **Feasibility Risk** — Proposal: Can engineers build this? Implementation: Was it built sustainably? Technical debt incurred?
-4. **Business Viability Risk** — Proposal: Does this work for the business? Implementation: Is it actually viable in production?
+Two modes based on what is being reviewed:
 
-For detailed scoring and evaluation questions, see [references/review-framework.md](references/review-framework.md).
+- **Proposal review** — Evaluating plans, specs, or roadmap items before building. Questions are forward-looking: "Is this worth building?"
+- **Implementation review** — Superset of proposal review, adding two layers:
+  1. **Compliance check** — Does the implementation satisfy everything product leadership would have required at proposal stage?
+  2. **Outcome confirmation** — Are the intended outcomes actually being achieved? What does the production data show?
 
-## Product Outcome Confirmation
+For proposals, questions are forward-looking. For implementations, apply ALL proposal-stage criteria first, then evaluate real-world results.
 
-Verify the five critical elements for confirming product outcomes:
-- **Outcome-Based OKRs** — Success measured by business results or user behavior, not task completion
-- **Leading Product Outcomes** — Team-controlled metrics that predict lagging business indicators
-- **Product Instrumentation** — Telemetry and analytics to track actual customer usage
-- **Guardrail Metrics** — Protections against negative side effects of optimizing a single metric
-- **Two-Way Negotiation** — Collaborative goal-setting between leadership and team, not top-down mandates
+## Evaluation dimensions and criteria
 
-For detailed evaluation criteria, see [references/outcome-confirmation.md](references/outcome-confirmation.md).
+Seven dimensions, each scored 1-5. Maximum score: 35. Each dimension has a matching evaluation file in `references/` (named `evaluation-{dimension}.md`) plus a shared scoring file ([evaluation-scoring.md](references/evaluation-scoring.md)) with verdict rules and thresholds.
 
-## Discovery Evidence
+### Dimension 1: Value Risk (/5)
+Problem specificity, demand evidence, need intensity, segment definition, alternative assessment.
 
-Is the work grounded in data from user tests, experiments, and customer interactions — or in opinions and stakeholder dictates? For implementations: is post-launch data being collected and acted on?
+### Dimension 2: Usability Risk (/5)
+User testing, learning curve, workflow fit, accessibility.
 
-For evidence quality spectrum and examples, see [references/strategic-context.md](references/strategic-context.md).
+### Dimension 3: Feasibility Risk (/5)
+Team capability, technical risks, estimation quality, dependencies, uncertainty reduction; at scale: operational readiness, infrastructure validation.
 
-## Review Workflow
+### Dimension 4: Business Viability Risk (/5)
+Business model alignment, legal compliance, unit economics, operationalization, competitive position; sales enablement.
 
-1. **Ingest Input** — Identify review mode (proposal or implementation), artifact type, and stated goal
-2. **Evaluate Each Risk** — Score 1-5 with rationale; see [references/review-framework.md](references/review-framework.md)
-   - For implementations: first assess whether each risk was properly addressed (compliance), then assess actual results
-3. **Confirm Product Outcomes** — Verify OKRs, instrumentation, guardrails; see [references/outcome-confirmation.md](references/outcome-confirmation.md)
-   - For implementations: verify outcomes are defined AND confirm they are being achieved with production data
-4. **Assess Discovery Evidence** — Verify evidence quality; see [references/strategic-context.md](references/strategic-context.md)
-   - For implementations: verify pre-build discovery was done AND post-launch data is being collected and acted on
-5. **Identify Anti-Patterns** — Flag leadership failure modes; see [references/anti-patterns.md](references/anti-patterns.md)
-6. **Produce Structured Output** — Write review using [references/feedback-template.md](references/feedback-template.md)
+### Dimension 5: Product Outcomes (/5)
+Outcome-based OKRs, leading indicators, instrumentation, guardrail metrics, two-way negotiation; extended: strategic alignment.
 
-## Anti-Patterns in Reviews
+### Dimension 6: Discovery Evidence (/5)
+Discovery activities, customer breadth, artifact existence, evidence recency, evidence quality.
 
-- **Output Bias**: Evaluating delivery velocity instead of problem-solving quality
-- **Skipping Risks**: Reviewing only feasibility while ignoring value or viability
-- **Advice Without Evidence**: Raising concerns without citing specific signals from the input
-- **Opinion Laundering**: Accepting claims about user needs that lack discovery evidence
-- **Guardrail Blindness**: Approving focused metrics without checking for negative side effects
+### Dimension 7: Instrumentation & Guardrails (/5)
+Telemetry coverage, KR measurability, workflow visibility, guardrail monitoring; metric validity, learning velocity.
+
+## AI product overlay
+
+When the input involves AI/ML, LLMs, generative AI, or intelligent features, the AI-specific files [frameworks-ai-evaluation.md](references/frameworks-ai-evaluation.md) and [anti-patterns-ai-product.md](references/anti-patterns-ai-product.md) apply. AI criteria cut across all seven dimensions — adding value risk questions (is AI the right tool?), usability risk questions (trust calibration, explainability), feasibility risk questions (data quality, inference cost, model drift), and viability risk questions (responsible AI, governance). Score the AI overlay alongside standard dimensions and note AI-specific findings in the output.
+
+## Leadership knowledge signals
+
+When scoring criteria, check whether the work demonstrates knowledge across four areas. These are quality signals within existing evaluations, not additional scored criteria:
+
+- **Customer Empathy** — Problem framing, segment awareness, evidence-based reasoning → signals in Value Risk, Discovery Evidence
+- **Outcome Thinking** — Leading/lagging distinction, OKR quality, guardrail awareness → signals in Product Outcomes
+- **Operational Rigor** — Instrumentation depth, measurement capability, iteration discipline → signals in Instrumentation & Guardrails
+- **Strategic Judgment** — Risk prioritization, viability assessment, business context → signals in Viability Risk, Feasibility Risk
+
+## Review workflow
+
+### 1. Ingest input
+Identify mode (proposal/implementation), artifact type, and stated goal.
+
+### 2. Load references
+Load reference files from `references/` progressively by prefix. Only load what the current step requires. **When `review-depth: comprehensive`** (e.g., invoked by bd-plan-reviewer): treat "contextual" and "on demand" references as mandatory for every scored dimension — load the matching anti-pattern file and calibration file proactively for each dimension you score, not only when uncertainty or contextual triggers arise.
+
+**Always load** (scoring framework, output format, and industry practices):
+- [evaluation-scoring.md](references/evaluation-scoring.md) — verdict thresholds and critical rules
+- [feedback-template.md](references/feedback-template.md) — output structure
+- [frameworks-industry-models.md](references/frameworks-industry-models.md) — Google/Netflix/Spotify/Apple/Microsoft product practices
+
+**Per-dimension** (load the matching `evaluation-*.md` file when scoring that dimension):
+- e.g., when scoring Value Risk, load `evaluation-value-risk.md`
+
+**Contextual** (load based on input characteristics):
+- `frameworks-*.md` — load relevant framework files when industry context, business model, company stage, competitive positioning, or edge cases are pertinent: [frameworks-business-models.md](references/frameworks-business-models.md), [frameworks-company-stages.md](references/frameworks-company-stages.md), [frameworks-competitive-positioning.md](references/frameworks-competitive-positioning.md), [frameworks-edge-cases-strategic.md](references/frameworks-edge-cases-strategic.md), [frameworks-edge-cases-market.md](references/frameworks-edge-cases-market.md), [frameworks-edge-cases-operational.md](references/frameworks-edge-cases-operational.md), [frameworks-edge-cases-risk.md](references/frameworks-edge-cases-risk.md). Load [frameworks-ai-evaluation.md](references/frameworks-ai-evaluation.md) when input involves AI/ML.
+- `anti-patterns-*.md` — load the anti-pattern file matching the dimension being scored (strategy-planning, outcomes-metrics, risk-assessment). Load `anti-patterns-ai-product.md` when input involves AI/ML.
+- [feedback-example-proposal.md](references/feedback-example-proposal.md) or [feedback-example-implementation.md](references/feedback-example-implementation.md) — load the one matching the review mode.
+
+**On demand** (when uncertain about a score boundary):
+- `calibration-*.md` — load the calibration file matching the dimension in question for weak/adequate/strong examples: calibration-value-risk.md, calibration-usability-risk.md, calibration-feasibility-risk.md, calibration-viability-risk.md, calibration-product-outcomes.md, calibration-discovery-evidence.md, calibration-instrumentation-guardrails.md, [calibration-ai-readiness.md](references/calibration-ai-readiness.md).
+
+### 3. Evaluate each risk dimension
+Load per-dimension evaluation files:
+- [evaluation-value-risk.md](references/evaluation-value-risk.md)
+- [evaluation-usability-risk.md](references/evaluation-usability-risk.md)
+- [evaluation-feasibility-risk.md](references/evaluation-feasibility-risk.md)
+- [evaluation-viability-risk.md](references/evaluation-viability-risk.md)
+
+Apply the evaluation criteria to score each of the 4 risk dimensions. For implementations: assess compliance first (what should have been in place), then actual results. Apply business model and company stage calibrations.
+
+### 4. Confirm product outcomes
+Load [evaluation-product-outcomes.md](references/evaluation-product-outcomes.md) and [evaluation-strategic-alignment.md](references/evaluation-strategic-alignment.md). Verify each Product Outcomes element including strategic alignment (P6). For implementations: confirm outcomes are defined AND being achieved with production data.
+
+### 5. Assess discovery evidence
+Load [evaluation-discovery-evidence.md](references/evaluation-discovery-evidence.md). Score discovery quality using the evidence quality spectrum. For implementations: verify pre-build discovery AND post-launch data collection.
+
+### 6. Score instrumentation & guardrails
+Load [evaluation-instrumentation-guardrails.md](references/evaluation-instrumentation-guardrails.md). Score against the instrumentation checklist and criteria, including metric validity and learning velocity.
+
+### 7. Identify anti-patterns
+Flag leadership failure modes using the loaded anti-pattern references. If AI is involved, also apply AI-specific anti-patterns.
+
+### 8. Produce structured output
+Write the review following the feedback template. Include per-dimension scorecards, overall verdict, issues by severity, strengths, top recommendation, and key question.
+
+## Anti-patterns
+
+Common product leadership failure modes to detect during review. Four categories — Strategy & Planning, Outcomes & Metrics, Risk Assessment, and AI Product — each with detailed Signs, Impact, Fix, and Detection guidance. See [anti-patterns-strategy-planning.md](references/anti-patterns-strategy-planning.md), [anti-patterns-outcomes-metrics.md](references/anti-patterns-outcomes-metrics.md), [anti-patterns-risk-assessment.md](references/anti-patterns-risk-assessment.md), and [anti-patterns-ai-product.md](references/anti-patterns-ai-product.md).
+
+## Calibration
+
+When uncertain about a score boundary (2 vs 3, 3 vs 4), load the matching calibration file (prefixed `calibration-`) from `references/` for weak/adequate/strong examples. Each dimension has a dedicated calibration file.
+
+## Industry frameworks & edge cases
+
+The frameworks references (prefixed `frameworks-`) contain industry-grounded evaluation context — Google/Netflix/Spotify/Apple/Microsoft product practices, business model guidance, company stage calibrations, competitive positioning analysis, AI evaluation criteria, and leadership edge case decision frameworks. Load the relevant `frameworks-*.md` files contextually per Step 2 and apply across dimensions to elevate the review beyond generic assessment.

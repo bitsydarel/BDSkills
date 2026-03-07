@@ -206,6 +206,19 @@
 | Design System | 10 (Design System), 2 (Usability), 6 (Accessibility) | 7 (Service Blueprint) |
 | Hardware Product | 10 (Feasibility/DFM), 1 (Problem Framing), 2 (Usability) | 3 (IA) |
 
+### Platform-Specific Weighting
+
+When the target platform is known, layer these weights on top of input-type weights. See [platform-overview.md](platform-overview.md) for full dimension interpretation per platform.
+
+| Platform | Higher Weight Dimensions | Lower Weight Dimensions |
+|----------|------------------------|------------------------|
+| CLI / Terminal | 2 (command ergonomics), 3 (command hierarchy), 10 (flag/output consistency) | 4 (visual design) |
+| Web | 2 (responsive usability), 3 (URL/IA), 6 (WCAG 2.2) | — |
+| Mobile | 2 (touch/gesture), 6 (accessibility — VoiceOver/TalkBack/Dynamic Type), 4 (platform visual conventions) | — |
+| IDE Plugin | 2 (non-disruptive), 10 (host integration), 3 (command palette/panel IA) | 4 (visual design), 7 (service blueprint) |
+| Desktop | 2 (keyboard-first), 3 (menu/toolbar IA), 10 (OS toolkit compliance) | 7 (service blueprint) |
+| API / Developer Tools | 2 (consistency/ergonomics), 3 (documentation IA), 10 (SDK coherence) | 4 (visual design), 8 (co-creation) |
+
 ---
 
 ## Verdict Thresholds

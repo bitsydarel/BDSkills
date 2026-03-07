@@ -1,6 +1,6 @@
 ---
 name: bd-product-owner-review
-description: "Reviews task plans, features, product proposals, and existing implementations through a Product Owner lens, evaluating backlog readiness, acceptance criteria quality, value maximization, stakeholder conflict resolution, scope control, outcome measurement, and iterative learning. Use when assessing a feature proposal, product backlog item, sprint plan, user story, backlog health, or reviewing an existing feature for Product Owner rigor."
+description: "Reviews task plans, features, product proposals, and existing implementations through a Product Owner lens."
 ---
 
 # Product Owner review

@@ -1,6 +1,6 @@
 ---
 name: bd-business-analyst-review
-description: "Reviews task plans, features, product proposals, and existing implementations through a Business Analyst lens — evaluating requirements completeness, stakeholder coverage, process modeling, business rule specification, data integrity, traceability, gap analysis, feasibility assessment, impact analysis, and acceptance criteria verifiability. Use when assessing a feature proposal, requirements specification, process change, system enhancement, or reviewing an existing implementation for Business Analyst rigor."
+description: "Reviews task plans, features, product proposals, and existing implementations through a Business Analyst lens."
 ---
 
 # Business Analyst review

@@ -1,6 +1,6 @@
 ---
 name: bd-create-agents-md
-description: "Step-by-step guide for creating your repo’s AGENTS.md or CLAUDE.md file — use whenever you want coding agents to reliably understand your repository’s core purpose, product, and target audience. Applies equally to AGENTS.md and CLAUDE.md, focusing on universal core elements for any repo type (agnostic). Use when setting up a new repo, restructuring, onboarding, compatibility checks, or major feature additions. Follows open standards and progressive disclosure."
+description: "Creates AGENTS.md or CLAUDE.md files for your repository."
 ---
 
 ## Understanding AGENTS.md and CLAUDE.md

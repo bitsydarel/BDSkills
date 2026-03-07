@@ -7,3 +7,12 @@
 # Claude local settings (not skills - those are in skills/)
 .claude/settings.local.json
 
+# Generated platform directories (synced from skills/ via sync-skills.sh)
+.agent/
+.cursor/
+.gemini/
+.opencode/
+
+# Generated agent content in .claude
+.claude/agents/
+

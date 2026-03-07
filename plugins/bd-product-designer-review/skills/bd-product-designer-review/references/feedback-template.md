@@ -18,8 +18,10 @@
 
 **Input**: [Title / description of what is being reviewed]
 **Review Mode**: [Proposal Review / Implementation Review]
+**Platform**: [CLI / Web / Mobile / IDE Plugin / Desktop / API / Multi-platform]
 **Perspective**: Product Designer (UXD, Interaction Design, User Research, Service Design)
 **Verdict**: [Proceed / Proceed with Conditions / Rework Required] — [Score]/50
+**Platform Complexity Notes**: [Key platform-specific considerations applied]
 
 ---
 
@@ -93,8 +95,10 @@
 
 **Input**: Mobile Banking App — New Onboarding Flow Redesign
 **Review Mode**: Proposal Review
+**Platform**: Mobile (iOS + Android)
 **Perspective**: Product Designer (UXD, Interaction Design, User Research, Service Design)
 **Verdict**: Proceed with Conditions — 34/50
+**Platform Complexity Notes**: Evaluated for Dynamic Type support, 44pt/48dp touch targets, foldable device considerations, dark mode (3 states), and offline-capable KYC flow
 
 ---
 
@@ -153,8 +157,10 @@ What happens when a user fails identity verification — have you designed the f
 
 **Input**: E-Commerce Checkout Redesign — launched 45 days ago, mixed usability results
 **Review Mode**: Implementation Review
+**Platform**: Web
 **Perspective**: Product Designer (UXD, Interaction Design, User Research, Service Design)
 **Verdict**: Needs Improvement — 29/50
+**Platform Complexity Notes**: Evaluated for Core Web Vitals (LCP/INP/CLS), cross-browser compatibility (Blink/WebKit/Gecko), responsive breakpoints, and progressive enhancement
 
 ---
 
@@ -241,7 +247,7 @@ Why was a focus group chosen over task-based usability testing, and what would i
 ## Quick Review Template
 
 ```markdown
-**Product Designer Quick Review** | [Input] | [Proposal/Implementation] | Score: __/50 | Verdict: [Proceed/Conditions/Rework]
+**Product Designer Quick Review** | [Input] | [Platform] | [Proposal/Implementation] | Score: __/50 | Verdict: [Proceed/Conditions/Rework]
 
 **Top 3 Issues**: 1) [Critical/Major — description] 2) [Critical/Major — description] 3) [Major/Minor — description]
 

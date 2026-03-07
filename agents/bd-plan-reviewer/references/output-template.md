@@ -1,6 +1,6 @@
 # Output Template — Plan Reviewer Agent
 
-Use this structure for the final output after all 10 review stages complete. The template adapts based on plan scope (see Output Depth Rule in AGENT.md).
+Use this structure for the final output after all 11 review stages complete. The template adapts based on plan scope (see Output Depth Rule in AGENT.md).
 
 ---
 
@@ -9,7 +9,7 @@ Use this structure for the final output after all 10 review stages complete. The
 The very first line of output. Uses a markdown header for prominence across CLI, IDE, and mobile:
 
 ```
-## Verdict: [Ready | Conditionally Ready | Not Ready] (X/10 passed)
+## Verdict: [Ready | Conditionally Ready | Not Ready] (X/11 passed)
 ```
 
 **Verdict criteria:**
@@ -29,7 +29,7 @@ Reviewing as: [natural language summary from Context Block]
 
 Example: "Reviewing as: a bug fix for login button alignment in an existing mobile app with active users"
 
-If context was revised after the 10-stage review (see Phase 3 in AGENT.md), include:
+If context was revised after the 11-stage review (see Phase 3 in AGENT.md), include:
 
 ```
 **Context revision:** Originally classified as [original]. After review, reclassified as [revised] because [reason].
@@ -51,7 +51,7 @@ Scaled by plan scope:
 **Date:** [Review date]
 
 ## Confidence
-- **X/10 passed** (Y with full applicability, Z with partial)
+- **X/11 passed** (Y with full applicability, Z with partial)
 - Applicable reviewer profile: N reviewers fully applicable, M with limited applicability
 
 ## Top Strengths
@@ -77,7 +77,7 @@ Scaled by plan scope:
 
 ## Section 2: Improved Plan
 
-This is the **primary deliverable** — the full plan text after all 10 reviewers have made their improvements. Wrap in a fenced code block for one-click copy in IDE panels:
+This is the **primary deliverable** — the full plan text after all 11 reviewers have made their improvements. Wrap in a fenced code block for one-click copy in IDE panels:
 
 ````
 ```markdown
@@ -95,7 +95,7 @@ This is the **primary deliverable** — the full plan text after all 10 reviewer
   - **[CONFLICT: Stage N said X, Stage M says Y]**
 - Do not include reviewer attribution within the plan text itself (that goes in the audit trail)
 
-**Skip this section entirely** if all 10 reviewers pass with no changes (the original plan needs no improvement).
+**Skip this section entirely** if all 11 reviewers pass with no changes (the original plan needs no improvement).
 
 ---
 
@@ -150,7 +150,7 @@ Reviewers with no applicable findings: Product Marketing, Product Designer, Prod
 Repeat the verdict before Next Steps so users scrolling through long output in IDE panels can find it:
 
 ```
-## Verdict: [Ready | Conditionally Ready | Not Ready] (X/10 passed)
+## Verdict: [Ready | Conditionally Ready | Not Ready] (X/11 passed)
 ```
 
 ---
@@ -200,17 +200,17 @@ Only include this section if there are meaningful omissions to document (typical
 
 ## Condensed Output Variant
 
-When **all 10 reviewers pass with no changes**, produce a minimal output:
+When **all 11 reviewers pass with no changes**, produce a minimal output:
 
 ```
-## Verdict: Ready (10/10 passed)
+## Verdict: Ready (11/11 passed)
 
 Reviewing as: [context summary]
 
-All 10 reviewers found no issues requiring plan changes. The plan is ready for implementation as-is.
+All 11 reviewers found no issues requiring plan changes. The plan is ready for implementation as-is.
 
 ### Audit Summary
-**1. Leadership** — PASS (N/N applicable) | **2. PM** — PASS (N/N) | **3. PMM** — PASS (N/N) | **4. BA** — PASS (N/N) | **5. Designer** — PASS (N/N) | **6. PO** — PASS (N/N) | **7. Architect** — PASS (N/N) | **8. Test** — PASS (N/N) | **9. QA** — PASS (N/N) | **10. Clean Code** — PASS (N/N)
+**1. Leadership** — PASS (N/N applicable) | **2. PM** — PASS (N/N) | **3. PMM** — PASS (N/N) | **4. BA** — PASS (N/N) | **5. Designer** — PASS (N/N) | **6. PO** — PASS (N/N) | **7. Architect** — PASS (N/N) | **8. Security** — PASS (N/N) | **9. Test** — PASS (N/N) | **10. QA** — PASS (N/N) | **11. Clean Code** — PASS (N/N)
 
 No next steps required. Proceed to implementation.
 ```

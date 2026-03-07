@@ -1,6 +1,6 @@
 ---
 name: bd-test-design
-description: "Comprehensive guide for designing and implementing software tests. Use when the user asks to write new tests, refactor existing tests, design test strategies, or improve code coverage for Unit, Integration, E2E, or UI automation across Web, Mobile, Backend, or AI platforms."
+description: "Designs and implements software tests."
 ---
 
 # Test Design

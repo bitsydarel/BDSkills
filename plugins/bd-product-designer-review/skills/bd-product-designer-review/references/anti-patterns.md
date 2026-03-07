@@ -208,3 +208,69 @@ Common failure modes in product design practice, organized by severity.
 | Opinion Over Evidence | Major | 5 (Research) | Both |
 | Focus Group Fallacy | Major | 5 (Research) | Both |
 | Satisfaction Score Complacency | Major | 5 (Research) | Implementation |
+
+---
+
+## Platform-Specific Anti-Patterns
+
+The following anti-patterns are unique to specific platforms. Full details (Signs, Impact, Fix) are in the individual platform files linked from [platform-overview.md](platform-overview.md).
+
+### CLI / Terminal
+
+| Pattern | Severity | Primary Dimension |
+|---------|----------|-------------------|
+| GUI-in-a-Terminal | Major | 2 (Usability) |
+| Flag Explosion | Major | 3 (IA) |
+| Silent Failure | Critical | 2 (Usability) |
+| Unpipeable Output | Major | 10 (Design System) |
+| Inconsistent Naming | Major | 10 (Design System) |
+
+### Web Applications
+
+| Pattern | Severity | Primary Dimension |
+|---------|----------|-------------------|
+| Desktop-First Neglect | Major | 2 (Usability) |
+| SPA Amnesia | Critical | 3 (IA) |
+| Form Fatigue | Major | 2 (Usability) |
+| Performance Blindness | Major | 2 (Usability) |
+| SEO Invisibility | Major | 3 (IA) |
+
+### Mobile Applications
+
+| Pattern | Severity | Primary Dimension |
+|---------|----------|-------------------|
+| Platform Denial | Critical | 10 (Design System) |
+| Desktop Miniaturization | Critical | 2 (Usability) |
+| Notification Spam | Major | 7 (Service Blueprint) |
+| Gesture Mystery | Major | 2 (Usability) |
+| Permission Ambush | Major | 1 (Problem Framing) |
+
+### IDE Plugin Extensions
+
+| Pattern | Severity | Primary Dimension |
+|---------|----------|-------------------|
+| Editor Hijack | Critical | 2 (Usability) |
+| Kitchen Sink Settings | Major | 3 (IA) |
+| Notification Flood | Major | 2 (Usability) |
+| Reinventing Host UI | Major | 10 (Design System) |
+| Context Ignorance | Major | 1 (Problem Framing) |
+
+### Desktop Applications
+
+| Pattern | Severity | Primary Dimension |
+|---------|----------|-------------------|
+| Web-in-a-Window | Critical | 10 (Design System) |
+| Menu Bar Desert | Major | 3 (IA) |
+| Single Window Tyranny | Major | 2 (Usability) |
+| Update Interruption | Major | 7 (Service Blueprint) |
+| File System Ignorance | Major | 10 (Design System) |
+
+### API / Developer Tools
+
+| Pattern | Severity | Primary Dimension |
+|---------|----------|-------------------|
+| Cryptic Errors | Critical | 2 (Usability) |
+| Documentation Drift | Critical | 3 (IA) |
+| Breaking in the Dark | Critical | 10 (Design System) |
+| Auth Labyrinth | Major | 2 (Usability) |
+| Undiscoverable API | Major | 3 (IA) |

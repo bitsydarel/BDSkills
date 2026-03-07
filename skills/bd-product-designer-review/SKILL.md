@@ -1,6 +1,6 @@
 ---
 name: bd-product-designer-review
-description: "Reviews task plans, features, product proposals, and existing implementations through a Product Designer lens — evaluating human-centered problem framing, usability and interaction quality, information architecture, visual design and brand expression, user research rigor, accessibility and inclusivity, service blueprint and end-to-end journey mapping, co-creation and stakeholder facilitation, prototyping and design validation, and design system coherence and feasibility. Use when assessing a feature proposal, design spec, UX strategy, service blueprint, prototype plan, or reviewing an existing feature for product design rigor."
+description: "Reviews task plans, features, product proposals, and existing implementations through a Product Designer lens."
 ---
 
 # Product Designer Review

@@ -1,6 +1,6 @@
 ---
 name: bd-project-conventions
-description: "Standards for project structure, environment configuration, and code organization. Use when scaffolding new projects, refactoring code, setting up environments, or troubleshooting import/build issues across Mobile, Web, and Backend platforms."
+description: "Standards for project structure, environment configuration, and code organization."
 ---
 
 # Project Conventions

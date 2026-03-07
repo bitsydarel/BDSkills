@@ -1,6 +1,6 @@
 ---
 name: bd-product-designer-review
-description: "Reviews task plans, features, product proposals, and existing implementations through a Product Designer lens — evaluating human-centered problem framing, usability and interaction quality, information architecture, visual design and brand expression, user research rigor, accessibility and inclusivity, service blueprint and end-to-end journey mapping, co-creation and stakeholder facilitation, prototyping and design validation, and design system coherence and feasibility. Use when assessing a feature proposal, design spec, UX strategy, service blueprint, prototype plan, or reviewing an existing feature for product design rigor."
+description: "Reviews task plans, features, product proposals, and existing implementations through a Product Designer lens."
 ---
 
 # Product Designer Review
@@ -30,6 +30,8 @@ The Product Designer is a first-class member of the cross-functional product tri
 
 Score each 1-5 per [references/evaluation-framework.md](references/evaluation-framework.md). Total /50.
 
+**Platform-specific interpretation**: When the target platform is known (CLI, Web, Mobile, IDE Plugin, Desktop, API), interpret each dimension through that platform's lens and apply platform-specific weighting. See [references/platform-overview.md](references/platform-overview.md) for per-platform dimension interpretation tables, complexity checklists, and anti-patterns.
+
 1. **Human-Centered Problem Framing** — Is the design grounded in real human needs? Empathy maps, persona validation, problem-space exploration before solution-space. (Norman HCD, IDEO Design Thinking)
 2. **Usability & Interaction Quality** — Is the interface learnable, efficient, error-preventing? Goal-directed design, cognitive load management, heuristic compliance. (Nielsen 10 Heuristics, Cooper Goal-Directed, Krug)
 3. **Information Architecture & Navigation** — Are content structures intuitive? Findability, labeling, mental models, wayfinding. (Garrett 5 Planes of UX, Card Sorting)
@@ -56,25 +58,37 @@ Knowledge signals cluster dimensions into interpretive themes, revealing where a
 
 Identify mode (proposal/implementation), artifact type (design spec, wireframe, prototype, shipped feature, service blueprint), stated goal. Determine if this is a product trio collaboration or a designer-only deliverable.
 
+**Identify the target platform**: CLI / Web / Mobile / IDE Plugin / Desktop / API / Multi-platform. If not stated, infer from context or review generically. For identified platforms, load the corresponding platform file from [references/platform-overview.md](references/platform-overview.md) — note platform complexity (e.g., "Mobile" → which screen sizes? Foldables? OEM targets? Tablet support?). For ambiguous cases, use the Platform Classification Guide. For multi-platform products, identify the primary platform and flag secondary platform gaps.
+
 ### 2. The Empathy Lens — Problem Framing & Research (Dims 1, 5, 6)
 
 Is this meaningfully solving the user's problem, or is it an "elegant solution looking for a problem"? Evaluate persona/scenario alignment, assumption checking, empathy artifacts, research rigor, accessibility foundations. Check: Does the design account for the user's actual context (noisy room, mobile while walking, skill level)?
+
+**Platform**: For CLI, is the user's terminal environment considered (width, color support, CI vs interactive)? For Mobile, are diverse device contexts evaluated (foldables, small phones, tablets, one-handed use)? For API, is the developer's integration context understood (language, framework, existing toolchain)?
 
 ### 3. The Friction Lens — Interaction & IA Quality (Dims 2, 3)
 
 Intuitiveness: Can the user understand the feature without a manual? Inelegant/arbitrary solutions: Is the workflow more awkward than it needs to be? Inconsistencies: Was a similar interaction handled differently elsewhere? Cognitive load: Does the visual hierarchy guide naturally, or is there clutter?
 
+**Platform**: For CLI, evaluate command ergonomics, composability, and discoverability via `--help`. For Mobile, touch targets (44pt/48dp), thumb zones, and gesture conventions. For Web, responsive behavior across breakpoints and Core Web Vitals. For IDE Plugin, Command Palette discoverability and non-disruptive interaction.
+
 ### 4. The Aesthetic & Brand Lens — Visual Design & Service Journey (Dims 4, 7)
 
 How does this make the user feel? Does it reflect the brand's experience attributes? Is the visual language communicative and consistent? Is the full service journey mapped (frontstage/backstage, touchpoints, moments of truth)?
+
+**Platform**: For CLI, terminal output formatting and NO_COLOR support. For IDE Plugin, host theme integration (dark/light/high contrast). For Desktop, OS-native visual language (Fluent Design on Windows, HIG on macOS). For Mobile, platform-specific visual conventions (HIG vs Material 3) and dark mode support.
 
 ### 5. The Feasibility & Viability Lens — Accessibility, Systems & Handoff (Dims 6, 10)
 
 Does a proposed design choice make implementation unnecessarily difficult without proportional user value? Ethical check: Are there dark patterns that serve business metrics at the expense of user trust? WCAG compliance? Design system alignment? Engineering handoff quality?
 
+**Platform**: For Mobile, OEM fragmentation and OS version support scope. For Web, cross-browser compatibility (Blink/WebKit/Gecko). For Desktop, native vs cross-platform framework tradeoffs (Electron vs Tauri vs native). For API, SDK language coverage and backward compatibility.
+
 ### 6. The Collaborative Critique & Testing Lens — Co-Creation & Prototyping (Dims 8, 9)
 
 Were design crits facilitated (green round: what works / red round: concerns + suggestions)? Were prototypes tested with real users to settle debates with behavioral evidence? Fidelity progression appropriate? Is the team using evidence, not opinions?
+
+**Platform**: For API/DX, developer community feedback and time-to-first-call testing with real developers. For CLI, shell completion testing and observation in real terminal workflows (interactive + scripted). For Mobile, on-device prototype testing (not desktop emulators) across diverse devices.
 
 ### 7. Produce Structured Output
 
@@ -82,7 +96,7 @@ Write review using [references/feedback-template.md](references/feedback-templat
 
 ## Anti-Patterns
 
-Watch for these recurring failure modes. Full details in [references/anti-patterns.md](references/anti-patterns.md).
+Watch for these recurring failure modes. Full details in [references/anti-patterns.md](references/anti-patterns.md). Platform-specific anti-patterns (30 total across 6 platforms) are indexed in the anti-patterns reference and detailed in [references/platform-overview.md](references/platform-overview.md).
 
 **Critical:**
 
@@ -90,24 +104,8 @@ Watch for these recurring failure modes. Full details in [references/anti-patter
 - **Research Theater** — Conducting user research but ignoring findings that contradict design decisions
 - **Siloed Touchpoint Design** — Designing individual screens without mapping the end-to-end service journey
 
-**Major:**
-
-- **Aesthetic Usability Trap** — Assuming beautiful = good without usability validation
-- **Accessibility Afterthought** — Treating WCAG as a post-design checklist instead of a foundation
-- **Stakeholder-Driven Design** — Internal politics override user evidence (HiPPO variant)
-- **Fidelity Escalation** — Jumping to high-fidelity before validating concepts at low fidelity
-- **Designer Hero Complex** — Designing in isolation without co-creation or cross-functional input
-- **Journey Gap** — Missing critical transition points between channels or touchpoints
-- **Component Soup** — Creating bespoke UI elements instead of extending the design system
-- **Empathy Deficit** — Personas exist on paper but were never validated with real users
-- **Convergence Without Divergence** — Jumping to solutions without exploring the problem space (skipping Diamond 1)
-- **Dark Pattern Drift** — Interaction patterns that serve business metrics at the expense of user trust
-- **Handoff Chasm** — Design specifications that engineering cannot implement as intended
-- **Requirements Receiver** — Designer receives requirements from PM instead of co-driving product discovery as a product trio member
-- **Opinion Over Evidence** — Design debates settled by seniority or eloquence rather than putting prototypes in front of real users
-- **Focus Group Fallacy** — Asking users "do you like this?" instead of task-based observation; collecting opinions when behavioral evidence is what matters
-- **Satisfaction Score Complacency** — Celebrating high CSAT/OSAT scores while ignoring that 60-80% of defectors rated themselves "satisfied"; not tracking true loyalty metrics
+**Major** (15 total — Aesthetic Usability Trap, Accessibility Afterthought, Stakeholder-Driven Design, and 12 more): See [references/anti-patterns.md](references/anti-patterns.md) for full list with descriptions.
 
 ## Calibration
 
-Use [references/calibration.md](references/calibration.md) for scoring anchors, framework quick references, usability heuristic checklists, UX metrics benchmarks, and design maturity spectrums.
+Use [references/calibration-frameworks.md](references/calibration-frameworks.md) for scoring anchors, framework quick references, usability heuristic checklists, and design maturity spectrums. For UX metrics and measurement benchmarks, see [references/calibration-metrics.md](references/calibration-metrics.md). For platform-specific calibration anchors (levels 5/3/1 for top-weighted dimensions per platform) and quantitative standards (Mobile touch targets, CLI exit codes), see [references/platform-calibration.md](references/platform-calibration.md).
