@@ -1,8 +1,16 @@
-# Product Outcome Confirmation
+# Dimension 5: Product Outcomes
 
-The five critical elements for confirming that product outcomes are properly defined, measurable, and being achieved. Without these elements, teams ship features without knowing whether they solved the problem.
+Are outcomes properly defined, measurable, and being achieved? This dimension evaluates five elements that together determine whether the team knows what success looks like and can confirm it.
 
-## Element 1: Outcome-Based OKRs
+## Criteria
+
+- **P1: Outcome-Based OKRs** — Success measured by business results or user behavior, not task completion
+- **P2: Leading Product Outcomes** — Team owns leading indicators they can directly influence
+- **P3: Product Instrumentation** — Telemetry and analytics to track actual customer usage
+- **P4: Guardrail Metrics** — Protections against negative side effects of optimizing a single metric
+- **P5: Two-Way Negotiation** — Collaborative goal-setting between leadership and team
+
+## P1: Outcome-Based OKRs
 
 The Objective describes the business or customer problem being solved — not a feature to ship. Key Results are quantitative metrics measured by business results or user behavior changes.
 
@@ -26,20 +34,18 @@ The Objective describes the business or customer problem being solved — not a 
 | Deploy new onboarding flow | Achieve 70% onboarding completion within first session |
 | Release mobile app v2.0 | Increase mobile task completion rate from 28% to 65% |
 
-### Scoring Guide
+### Element Scoring
 
 - **Present**: OKRs exist with outcome-based KRs, baselines, and targets
 - **Partial**: OKRs exist but KRs are output-based or lack baselines
 - **Missing**: No defined success criteria, or criteria are purely delivery-based
 
-## Element 2: Leading Product Outcomes
+## P2: Leading Product Outcomes
 
 Distinguish between business outcomes (lagging indicators the company cares about) and product outcomes (leading indicators the team can directly influence).
 
 **Business outcomes** (lagging): Revenue, 90-day retention, market share, customer lifetime value
 **Product outcomes** (leading): Onboarding completion, time-to-value, feature adoption, perceived value score
-
-Teams must own leading indicators they can directly influence. Lagging indicators confirm the strategy is working but take too long for iteration cycles.
 
 ### Evaluation Questions
 
@@ -59,15 +65,15 @@ Teams must own leading indicators they can directly influence. Lagging indicator
 | Support ticket resolution speed | NPS / CSAT |
 | Activation rate (key action taken) | Monthly active users |
 
-### Scoring Guide
+### Element Scoring
 
 - **Present**: Leading/lagging distinction is clear; team owns leading indicators; hypothesis documented
 - **Partial**: Some metrics defined but no clear leading/lagging separation
 - **Missing**: Only lagging business metrics; team has no leading indicators to iterate on
 
-## Element 3: Product Instrumentation & Telemetry
+## P3: Product Instrumentation
 
-Products must be heavily instrumented to track actual customer usage. Without telemetry, leadership cannot confirm whether an outcome was achieved — the team is flying blind.
+Products must be heavily instrumented to track actual customer usage. Without telemetry, leadership cannot confirm whether an outcome was achieved.
 
 ### Evaluation Questions
 
@@ -85,22 +91,20 @@ Products must be heavily instrumented to track actual customer usage. Without te
 - [ ] **Cohort analysis**: Ability to segment users by behavior, signup date, or persona
 - [ ] **Custom dashboards**: KR metrics visible in a single view with trend lines
 
-### Scoring Guide
+### Element Scoring
 
 - **Present**: Comprehensive instrumentation covering all KRs; dashboards in place; team reviews data regularly
 - **Partial**: Some tracking exists but gaps prevent measuring key outcomes
 - **Missing**: No telemetry; outcomes cannot be confirmed with data
 
-## Element 4: Guardrail Metrics
+## P4: Guardrail Metrics
 
 Focusing on one metric can cause damage elsewhere. Guardrails protect overall business health while the team optimizes specific outcomes.
-
-An Overall Evaluation Criterion (OEC) can encode acceptable trade-offs: "Increase activation rate while keeping 7-day retention above 60% and support tickets below 50/week."
 
 ### Evaluation Questions
 
 1. What guardrail metrics are defined alongside primary KRs?
-2. Could optimizing the primary metric harm another area? (e.g., engagement up, but quality down)
+2. Could optimizing the primary metric harm another area?
 3. Are acceptable trade-offs explicitly documented?
 4. Who monitors guardrails, and what happens when one is breached?
 
@@ -114,22 +118,20 @@ An Overall Evaluation Criterion (OEC) can encode acceptable trade-offs: "Increas
 | Performance | Page load time | Error rate stays below 0.1% |
 | Growth | Activation rate | 7-day retention stays above 60% |
 
-### Scoring Guide
+### Element Scoring
 
 - **Present**: Guardrails defined for each primary KR; trade-offs documented; monitoring in place
 - **Partial**: Some awareness of trade-offs but no formal guardrails
 - **Missing**: Single-metric focus with no side-effect protection
 
-## Element 5: Two-Way Negotiation
+## P5: Two-Way Negotiation
 
 Goal-setting is collaborative, not top-down. Leadership provides strategic intent and business context. The team communicates what metric movement is realistic within the timeframe.
-
-**Top-down mandates fail** because leadership lacks the ground-level insight to set achievable targets, and teams lack ownership of goals they didn't help define.
 
 ### Evaluation Questions
 
 1. Was the goal collaboratively set between leadership and the product team?
-2. Does the team believe the target is achievable given current resources and constraints?
+2. Does the team believe the target is achievable given current resources?
 3. Did the team have input on both the metric chosen and the target timeframe?
 4. Is there a mechanism for renegotiation if assumptions change mid-cycle?
 5. Does the team understand the strategic context behind the goal?
@@ -141,18 +143,35 @@ Goal-setting is collaborative, not top-down. Leadership provides strategic inten
 - No mechanism to adjust goals when context changes
 - Team is measured on metrics they cannot influence
 
-### Scoring Guide
+### Element Scoring
 
 - **Present**: Collaborative goal-setting with documented rationale; team has ownership and believes targets are achievable
 - **Partial**: Some collaboration but targets feel imposed; limited team input
 - **Missing**: Pure top-down mandate; team is handed metrics without context
 
+## Dimension Score Aggregation
+
+Map element statuses to the overall Product Outcomes dimension score:
+
+| Element Statuses | Dimension Score |
+|-----------------|----------------|
+| All 5 Present | 5 |
+| 4 Present, 1 Partial | 4 |
+| 3 Present, others Partial or better | 4 |
+| 2-3 Present, rest Partial | 3 |
+| 1 Present, rest Partial or Missing | 2 |
+| All Missing or only 1 Partial | 1 |
+
+**Override:** If P1 (Outcome-Based OKRs) is Missing, the dimension score cannot exceed 2 regardless of other elements.
+
 <OutcomeConfirmationSummary>
   <Elements count="5">
-    <Element name="Outcome-Based OKRs" status="Present/Partial/Missing" />
-    <Element name="Leading Product Outcomes" status="Present/Partial/Missing" />
-    <Element name="Product Instrumentation" status="Present/Partial/Missing" />
-    <Element name="Guardrail Metrics" status="Present/Partial/Missing" />
-    <Element name="Two-Way Negotiation" status="Present/Partial/Missing" />
+    <Element name="Outcome-Based OKRs" id="P1" status="Present/Partial/Missing" />
+    <Element name="Leading Product Outcomes" id="P2" status="Present/Partial/Missing" />
+    <Element name="Product Instrumentation" id="P3" status="Present/Partial/Missing" />
+    <Element name="Guardrail Metrics" id="P4" status="Present/Partial/Missing" />
+    <Element name="Two-Way Negotiation" id="P5" status="Present/Partial/Missing" />
   </Elements>
 </OutcomeConfirmationSummary>
+
+**Extended element:** For P6 (Strategic Alignment), see [evaluation-strategic-alignment.md](evaluation-strategic-alignment.md).
